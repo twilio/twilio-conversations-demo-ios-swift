@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="18154" systemVersion="20E241" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="PersistentConversationDataItem" representedClassName="PersistentConversationDataItem" syncable="YES">
+        <attribute name="attributes" optional="YES" attributeType="String"/>
+        <attribute name="createdBy" optional="YES" attributeType="String"/>
+        <attribute name="dateCreated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dateUpdated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="friendlyName" optional="YES" attributeType="String"/>
+        <attribute name="lastMessageDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="messagesCount" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="notificationLevel" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="participantsCount" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="sid" optional="YES" attributeType="String"/>
+        <attribute name="uniqueName" optional="YES" attributeType="String"/>
+        <attribute name="unreadMessagesCount" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="PersistentMessageDataItem" representedClassName="PersistentMessageDataItem" syncable="YES">
+        <attribute name="author" optional="YES" attributeType="String"/>
+        <attribute name="body" optional="YES" attributeType="String"/>
+        <attribute name="bytesUploaded" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="conversationSid" optional="YES" attributeType="String"/>
+        <attribute name="dateCreated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dateUpdated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="direction" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="index" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="mediaDownloadStatus" optional="YES" attributeType="Integer 16" defaultValueString="-1" usesScalarValueType="YES"/>
+        <attribute name="mediaSid" optional="YES" attributeType="String"/>
+        <attribute name="mediaURL" optional="YES" attributeType="String"/>
+        <attribute name="participantSid" optional="YES" attributeType="String"/>
+        <attribute name="sendStatus" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="sid" optional="YES" attributeType="String"/>
+        <attribute name="totalBytes" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="type" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="uuid" optional="YES" attributeType="String"/>
+        <relationship name="reactions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="PersistentMessageReactionDataItem" inverseName="message" inverseEntity="PersistentMessageReactionDataItem"/>
+    </entity>
+    <entity name="PersistentMessageReactionDataItem" representedClassName="PersistentMessageReactionDataItem" syncable="YES">
+        <attribute name="reactionType" attributeType="String"/>
+        <relationship name="message" maxCount="1" deletionRule="Cascade" destinationEntity="PersistentMessageDataItem" inverseName="reactions" inverseEntity="PersistentMessageDataItem"/>
+        <relationship name="participant" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PersistentParticipantDataItem" inverseName="reactions" inverseEntity="PersistentParticipantDataItem"/>
+    </entity>
+    <entity name="PersistentParticipantDataItem" representedClassName="PersistentParticipantDataItem" syncable="YES">
+        <attribute name="attributes" optional="YES" attributeType="String"/>
+        <attribute name="conversationSid" optional="YES" attributeType="String"/>
+        <attribute name="identity" optional="YES" attributeType="String"/>
+        <attribute name="isTyping" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="lastReadMessage" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="sid" optional="YES" attributeType="String"/>
+        <attribute name="type" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="reactions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="PersistentMessageReactionDataItem" inverseName="participant" inverseEntity="PersistentMessageReactionDataItem"/>
+    </entity>
+    <elements>
+        <element name="PersistentConversationDataItem" positionX="-218.484375" positionY="85.9375" width="128" height="209"/>
+        <element name="PersistentMessageDataItem" positionX="-63" positionY="90" width="128" height="313"/>
+        <element name="PersistentMessageReactionDataItem" positionX="-225" positionY="189" width="128" height="88"/>
+        <element name="PersistentParticipantDataItem" positionX="-388.6484375" positionY="108.203125" width="128" height="163"/>
+    </elements>
+</model>

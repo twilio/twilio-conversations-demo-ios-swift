@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="IncomingMessageCell" rowHeight="238" id="gIf-ea-EP2" userLabel="IncommingMessage" customClass="IncommingMessageCell" customModule="ConversationsApp" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="493" height="238"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="gIf-ea-EP2" id="ufy-r8-FRn">
+                <rect key="frame" x="0.0" y="0.0" width="493" height="238"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="demo_avatar" translatesAutoresizingMaskIntoConstraints="NO" id="x3s-6B-Eyz">
+                        <rect key="frame" x="8" y="8" width="48" height="48"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="48" id="MeA-YY-5Of"/>
+                            <constraint firstAttribute="height" constant="48" id="e4G-I8-wE3"/>
+                        </constraints>
+                    </imageView>
+                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="9AW-Ju-SRe">
+                        <rect key="frame" x="72" y="8" width="421" height="222"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text=" A very long text that" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QyW-3j-ryv" userLabel="MessageBody" customClass="LabelMessageBody" customModule="ConversationsApp" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="157.5" height="174"/>
+                                <color key="backgroundColor" name="MessageBackground"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="izC-KA-xYv">
+                                <rect key="frame" x="0.0" y="182" width="401" height="40"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="033-kw-HZe"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="280" id="hAC-uK-KjR"/>
+                                </constraints>
+                                <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="4" minimumInteritemSpacing="0.0" id="M0t-WK-32d">
+                                    <size key="itemSize" width="48" height="32"/>
+                                    <size key="estimatedItemSize" width="48" height="32"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                            </collectionView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="izC-KA-xYv" secondAttribute="trailing" constant="20" symbolic="YES" id="IJe-iV-BI0"/>
+                        </constraints>
+                    </stackView>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="9AW-Ju-SRe" firstAttribute="top" secondItem="ufy-r8-FRn" secondAttribute="top" constant="8" id="Gck-ot-2a0"/>
+                    <constraint firstItem="9AW-Ju-SRe" firstAttribute="leading" secondItem="x3s-6B-Eyz" secondAttribute="trailing" constant="16" id="OSf-ly-c2C"/>
+                    <constraint firstItem="x3s-6B-Eyz" firstAttribute="top" secondItem="ufy-r8-FRn" secondAttribute="top" constant="8" id="Vht-gn-hMi"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="QyW-3j-ryv" secondAttribute="trailing" constant="80" id="Wot-KP-c4I"/>
+                    <constraint firstAttribute="bottom" secondItem="9AW-Ju-SRe" secondAttribute="bottom" constant="8" id="c4A-52-jWj"/>
+                    <constraint firstAttribute="trailing" secondItem="9AW-Ju-SRe" secondAttribute="trailing" id="nL1-iC-dDg"/>
+                    <constraint firstItem="x3s-6B-Eyz" firstAttribute="leading" secondItem="ufy-r8-FRn" secondAttribute="leading" constant="8" id="qB9-az-95H"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="bodyLabel" destination="QyW-3j-ryv" id="JCJ-Lk-kqz"/>
+                <outlet property="messageReactionsView" destination="izC-KA-xYv" id="CU9-v5-rS1"/>
+            </connections>
+            <point key="canvasLocation" x="47.10144927536232" y="279.91071428571428"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="demo_avatar" width="196" height="182"/>
+        <namedColor name="MessageBackground">
+            <color red="0.75" green="0.75" blue="0.75" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

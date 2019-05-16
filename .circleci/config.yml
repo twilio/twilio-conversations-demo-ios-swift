@@ -1,0 +1,142 @@
+version: 2.1
+
+aliases:
+  - &workspace
+    ~/conversations-app
+  - &test_results_folder
+    /tmp/junit
+  - build-type-parameter: &build-type-parameter
+      build-type:
+        description: "Build type to build"
+        type: string
+
+executors:
+  macos-ios-executor:
+    macos:
+      xcode: "12.2.0"
+    resource_class: large
+    working_directory: *workspace
+
+commands:
+  download_dependencies:
+    description: Download Dependencies
+    steps:
+      - run:
+          name: Install Bundler
+          command: sudo gem install bundler
+
+      - run:
+          name: Install dependencies
+          command: |
+            brew cask install google-cloud-sdk || true
+
+      - run:
+          name: Fix connection to GH for SPM
+          command: |
+            sudo defaults write com.apple.dt.Xcode IDEPackageSupportUseBuiltinSCM YES
+            rm ~/.ssh/id_rsa || true
+            for ip in $(dig @8.8.8.8 github.com +short); do ssh-keyscan github.com,$ip; ssh-keyscan $ip; done 2>/dev/null >> ~/.ssh/known_hosts
+      - run:
+          name: Prepare Mockingbird
+          command: |
+            xcodebuild -resolvePackageDependencies
+            DERIVED_DATA=$(xcodebuild -showBuildSettings | pcre2grep -o1 'OBJROOT = (/.*)/Build')
+            (cd "${DERIVED_DATA}/SourcePackages/checkouts/mockingbird" && make install-prebuilt)
+            mockingbird download starter-pack
+
+      - restore_cache:
+          key: bundle-v1-{{ checksum "Gemfile.lock" }}
+      - run:
+          name: Install dependencies
+          command: bundle install --path vendor/bundle
+      - save_cache:
+          key: bundle-v1-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+
+  generate_gcloud_settings:
+    description: Generate GCloud settings
+    steps:
+      - run:
+          name: Decode Google Cloud key.json
+          command: echo "$GCLOUD_SETTINGS" | base64 --decode > gcloud_settings.json
+      - run:
+          name: Set Google Cloud target project
+          command: gcloud config set project rtd-shared-lib
+      - run:
+          name: Authenticate with Google Cloud
+          command: gcloud auth activate-service-account ${GCLOUD_PROJECT}@appspot.gserviceaccount.com --key-file=gcloud_settings.json --project=${GCLOUD_PROJECT}
+      - run:
+          name: Decode GoogleService-Info.plist
+          command: echo "$GSERVICE_INFO" | base64 --decode > ConversationsApp/GoogleService-Info.plist
+
+  install_certificates:
+    description: Install certificates
+    steps:
+      - run:
+          name: Create Matchfile
+          command: echo "${MATCH_FILE}" | base64 --decode > Matchfile
+      - run:
+          name: Install certificates
+          command: ./Scripts/install-ios-certificates.sh
+
+jobs:
+  test-sim:
+    executor: macos-ios-executor
+    parameters:
+      <<: *build-type-parameter
+    steps:
+      - checkout
+      - install_certificates
+      - download_dependencies
+      - run:
+          name: Run tests
+          command: xcodebuild -project ConversationsApp.xcodeproj -scheme ConversationsApp -configuration << parameters.build-type >> -destination "name=iPhone 11" ACCESS_TOKEN_SERVICE_URL=$ACCESS_TOKEN_SERVICE_URL test | bundle exec xcpretty
+
+  test_in_ftl:
+    executor: macos-ios-executor
+    parameters:
+      <<: *build-type-parameter
+    steps:
+      - checkout
+      - generate_gcloud_settings
+      - attach_workspace:
+          at: *workspace
+      - run:
+          name: Build project for FTL testing
+          command: xcodebuild -project ConversationsApp.xcodeproj -scheme ConversationsApp -configuration << parameters.build-type >> -sdk iphoneos12.2 build-for-testing | bundle exec xcpretty
+      - run:
+          name: Run androidTest in Firebase Test Lab
+          command: ./Scripts/run-tests-in-gcloud.sh
+      - store_artifacts:
+          name: Uploading FTL tests artifacts
+          path: output/Results.tgz
+          destination: results
+      - store_test_results:
+          path: *test_results_folder
+
+workflows:
+  version: 2.1
+  workflow:
+    jobs:
+      - test-sim:
+          name: test-debug
+          build-type: Debug
+          context: rtd-demo-ios-build
+      # - test-sim:
+      #     name: test-release
+      #     build-type: Release
+      #     context: rtd-demo-ios-build
+      # TODO: uncomment when it would be possible to run tests with Swift code on FTL
+      # - test_in_ftl:
+      #     name: test-in-ftl-debug
+      #     build-type: debug
+      #     context: rtd-demo-ios-build
+      #     requires:
+      #       - build-debug
+      # - test_in_ftl:
+      #     name: test-in-ftl-release
+      #     build-type: release
+      #     context: rtd-demo-ios-build
+      #     requires:
+      #       - build-release

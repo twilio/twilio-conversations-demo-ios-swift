@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="192" id="KGk-i7-Jjw" customClass="IncomingMediaMessageCell" customModule="ConversationsApp" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="192"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" ambiguous="YES" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="192"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="08R-Js-cA7">
+                        <rect key="frame" x="8" y="8" width="150" height="175"/>
+                        <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="150" id="I8c-9Z-nDb"/>
+                            <constraint firstAttribute="height" constant="175" id="uhT-6f-o5n"/>
+                        </constraints>
+                    </imageView>
+                    <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="HCh-dn-gZj">
+                        <rect key="frame" x="64.5" y="77" width="37" height="37"/>
+                    </activityIndicatorView>
+                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2hC-dm-dOp">
+                        <rect key="frame" x="64.5" y="80.5" width="37" height="30"/>
+                        <state key="normal" title="Retry"/>
+                        <connections>
+                            <action selector="onRetryTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="FfN-6q-9Db"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="2hC-dm-dOp" firstAttribute="centerX" secondItem="08R-Js-cA7" secondAttribute="centerX" id="4Xw-57-cd3"/>
+                    <constraint firstItem="2hC-dm-dOp" firstAttribute="centerY" secondItem="08R-Js-cA7" secondAttribute="centerY" id="8Op-bl-Z1C"/>
+                    <constraint firstItem="08R-Js-cA7" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="HSZ-15-u9x"/>
+                    <constraint firstItem="HCh-dn-gZj" firstAttribute="centerX" secondItem="08R-Js-cA7" secondAttribute="centerX" id="LAh-ZE-sY1"/>
+                    <constraint firstAttribute="bottom" secondItem="08R-Js-cA7" secondAttribute="bottom" constant="8" id="h5G-bY-6cB"/>
+                    <constraint firstItem="08R-Js-cA7" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="8" id="huK-OV-u3G"/>
+                    <constraint firstItem="HCh-dn-gZj" firstAttribute="centerY" secondItem="08R-Js-cA7" secondAttribute="centerY" id="szz-cZ-D4P"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="loadingIndicartor" destination="HCh-dn-gZj" id="pMc-aC-bO1"/>
+                <outlet property="mediaImageView" destination="08R-Js-cA7" id="0JY-Yg-qCb"/>
+                <outlet property="retryButton" destination="2hC-dm-dOp" id="6i8-ea-YDs"/>
+            </connections>
+            <point key="canvasLocation" x="140.57971014492756" y="101.78571428571428"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <systemColor name="opaqueSeparatorColor">
+            <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

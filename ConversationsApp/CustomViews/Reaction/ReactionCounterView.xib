@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ReactionCounterView" customModule="ConversationsApp" customModuleProvider="target">
+            <connections>
+                <outlet property="label" destination="N1q-uv-jyP" id="d8I-ZX-zW2"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iN0-l3-epB" customClass="UICollectionViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="48" height="24"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="😀 99+" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="N1q-uv-jyP" userLabel="text">
+                    <rect key="frame" x="5" y="6" width="38" height="12"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="9"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <color key="backgroundColor" name="reactionBackground"/>
+            <constraints>
+                <constraint firstItem="N1q-uv-jyP" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="81M-VH-2Eg"/>
+                <constraint firstItem="N1q-uv-jyP" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="0.788462" id="Dg7-rC-2mb"/>
+                <constraint firstAttribute="width" constant="48" id="e31-VL-mIz"/>
+                <constraint firstItem="N1q-uv-jyP" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="fkb-L2-Gwb"/>
+                <constraint firstItem="N1q-uv-jyP" firstAttribute="height" secondItem="iN0-l3-epB" secondAttribute="height" multiplier="0.5" id="jTV-bu-Lpa"/>
+            </constraints>
+            <nil key="simulatedTopBarMetrics"/>
+            <nil key="simulatedBottomBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="-114.49275362318842" y="192.85714285714286"/>
+        </view>
+    </objects>
+    <resources>
+        <namedColor name="reactionBackground">
+            <color red="0.86100000143051147" green="0.86100000143051147" blue="0.86100000143051147" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>
