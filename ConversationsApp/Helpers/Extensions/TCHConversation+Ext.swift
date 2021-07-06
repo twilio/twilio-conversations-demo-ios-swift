@@ -36,7 +36,7 @@ extension TCHConversation {
                 if let lastMessageDate = self.lastMessageDate {
                     storedConversation.lastMessageDate = lastMessageDate.timeIntervalSince1970
                 }
-                conversationDao.insertOrUpdate([storedConversation])
+                conversationDao.upsert([storedConversation])
             }
 
             self.getParticipantsCount { result, count in
@@ -45,7 +45,7 @@ extension TCHConversation {
                 }
                 storedConversation.participantsCount = Int(count)
                 DispatchQueue.global().async {
-                    conversationDao.insertOrUpdate([storedConversation])
+                    conversationDao.upsert([storedConversation])
                 }
             }
 
@@ -57,7 +57,7 @@ extension TCHConversation {
                 }
                 storedConversation.unreadMessagesCount = count.intValue
                 DispatchQueue.global().async {
-                    conversationDao.insertOrUpdate([storedConversation])
+                    conversationDao.upsert([storedConversation])
                 }
             }
 
@@ -67,7 +67,7 @@ extension TCHConversation {
                 }
                 storedConversation.messagesCount = Int(count)
                 DispatchQueue.global().async {
-                    conversationDao.insertOrUpdate([storedConversation])
+                    conversationDao.upsert([storedConversation])
                 }
             }
         }

@@ -21,6 +21,7 @@ protocol ConversationsRepositoryProtocol: AnyObject {
     func getConversationSidToNavigateTo() -> String?
 
     // MARK: - Message methods
+    func getObservableMessages(for conversationSid: String) -> ObservableFetchRequestResult<PersistentMessageDataItem>
     func getMessages(for conversationSid: String, by pageSize: UInt) -> RepositoryResultHandle<PersistentMessageDataItem>
     func getMessageWithUuid(_ uuid: String) -> RepositoryResultHandle<PersistentMessageDataItem>
     func insertMessages(_ messages: [MessageDataItem], for conversationSid: String)
@@ -31,5 +32,4 @@ protocol ConversationsRepositoryProtocol: AnyObject {
 
     // MARK: - Participants methods
     func getTypingParticipants(inConversation conversationSid: String) -> RepositoryResultHandle<PersistentParticipantDataItem>
-
 }

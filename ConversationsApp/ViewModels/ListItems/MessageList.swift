@@ -17,17 +17,17 @@ struct MessageList {
 
     private var participantsTyping = [TypingParticipantViewModel]()
 
-    private var messageListOrder: (MessageDataListItem, MessageDataListItem) -> (Bool) = { $0.dateCreated < $1.dateCreated }
+    static let messageListOrder: (MessageDataListItem, MessageDataListItem) -> (Bool) = { $0.dateCreated < $1.dateCreated }
 
-    var delegate:MessageItemsDelegate?
+    var delegate: MessageItemsDelegate?
 
-    mutating func updateMessages(items: [PersistentMessageDataItem]) {
+    mutating func updateMessages(from items: [PersistentMessageDataItem]) {
         messageItems = items.compactMap { MessageDataListItem(item: $0.getMessageDataItem()) }
-            .sorted(by: messageListOrder)
+            .sorted(by: Self.messageListOrder)
         delegate?.onItemsChanged(items: self.buildItems())
     }
 
-    mutating func updateTypingParticipants(items: [PersistentParticipantDataItem]) {
+    mutating func updateTypingParticipants(for items: [PersistentParticipantDataItem]) {
         participantsTyping = items.compactMap {TypingParticipantViewModel(participant: $0.getParticipantDataItem()) }
         delegate?.onItemsChanged(items: self.buildItems())
     }

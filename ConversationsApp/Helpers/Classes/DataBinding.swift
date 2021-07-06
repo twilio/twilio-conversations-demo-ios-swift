@@ -88,13 +88,13 @@ class ObservableFetchRequestResult<T>: NSObject, NSFetchedResultsControllerDeleg
     }
 
     private func notifyObservers() {
-        print("notify \(observers.count) observers, \(self)")
         observers.removeAll { $0.owner == nil }
         observers.forEach { $0.onChanged(value) }
     }
 
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        print("controllerDidChangeContent, \(observers.count), \(self)")
-        notifyObservers()
+        DispatchQueue.global().async {
+            self.notifyObservers()
+        }
     }
 }

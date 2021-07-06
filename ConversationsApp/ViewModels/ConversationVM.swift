@@ -16,19 +16,22 @@ class ConversationViewModel: NSObject {
     
     // MARK: Properties
     private let PAGE_SIZE: UInt = 20
+
     private let conversationSid: String
     private let conversationsRepository: ConversationsRepositoryProtocol
     private let messagesManager: MessagesManagerProtocol
+
     private(set) var observableConversation: ObservableFetchRequestResult<PersistentConversationDataItem>?
-    private(set) var observableMessageList: ObservableFetchRequestResult<PersistentMessageDataItem>?
+    lazy private(set) var observableMessageList = conversationsRepository.getObservableMessages(for: conversationSid)
     private(set) var observervableTypingMemeberList: ObservableFetchRequestResult<PersistentParticipantDataItem>?
     private(set) var messageItems: [MessageListItemCell] = [] {
         didSet {
             self.delegate?.messageListUpdated(from: oldValue, to: messageItems)
         }
     }
+
     // Message Items List container
-    private var messageList: MessageList
+    private var messageList = MessageList()
     var itemCount: Int {
         get {
             self.messageItems.count
@@ -42,9 +45,9 @@ class ConversationViewModel: NSObject {
         self.conversationSid = conversationSid
         self.conversationsRepository = conversationsRepository
         self.messagesManager = messagesManager
-        messagesManager.conversationSid = conversationSid
-        self.messageList = MessageList()
         super.init()
+
+        messagesManager.conversationSid = conversationSid
         self.messagesManager.delegate = self
         self.messageList.delegate = self
     }
@@ -71,10 +74,10 @@ class ConversationViewModel: NSObject {
         unsubscribeFromConversationChanges()
     }
     
-    // MARK:- Methods
+    // MARK: Methods
     private func unsubscribeFromConversationChanges() {
         observableConversation?.removeObserver(self)
-        observableMessageList?.removeObserver(self)
+        observableMessageList.removeObserver(self)
         observervableTypingMemeberList?.removeObserver(self)
     }
     
@@ -89,22 +92,21 @@ class ConversationViewModel: NSObject {
             guard let participants = participants else {
                 return
             }
-            self?.messageList.updateTypingParticipants(items: participants)
+            self?.messageList.updateTypingParticipants(for: participants)
         }
     }
 
     private func listenForConversationMessagesChanges() {
-        observableMessageList?.observe(with: self) { [weak self]messages in
+        observableMessageList.observe(with: self) { [weak self] messages in
             guard let messages = messages else {
                 return
             }
-            self?.messageList.updateMessages(items: messages)
+            self?.messageList.updateMessages(from: messages)
         }
     }
     
     func loadConversation() {
         observableConversation = fetchConversation(sid: conversationSid)
-        observableMessageList = fetchMessages()
         observervableTypingMemeberList = conversationsRepository.getTypingParticipants(inConversation: conversationSid).data
         listenForConversationChanges()
         listenForConversationMessagesChanges()
@@ -127,17 +129,7 @@ class ConversationViewModel: NSObject {
     }
     
     private func fetchMessages() -> ObservableFetchRequestResult<PersistentMessageDataItem> {
-        let resultHandle = conversationsRepository.getMessages(for: conversationSid, by: PAGE_SIZE)
-        
-        resultHandle.requestStatus.observe(with: self) { status in
-            switch status {
-            case .error(let error):
-                self.delegate?.onDisplayError(error)
-            default:
-                break
-            }
-        }
-        return resultHandle.data
+        return conversationsRepository.getObservableMessages(for: conversationSid)
     }
 
     private func createConversationMessageListViewModels(from items: [MessageDataItem]) -> [MessageDataListItem] {
@@ -145,7 +137,7 @@ class ConversationViewModel: NSObject {
     }
 
     func sendMediaMessage(inputStream: InputStream, mimeType: String, inputSize: Int ) {
-        messagesManager.sendMediaMessage(onConversation: conversationSid, inputStream: inputStream, mimeType: mimeType, inputSize: inputSize)
+        messagesManager.sendMediaMessage(toConversationWithSid: conversationSid, inputStream: inputStream, mimeType: mimeType, inputSize: inputSize)
     }
 
     func getActionOnMessage(_ message: MessageDataListItem) -> [MessageAction] {
@@ -188,7 +180,7 @@ extension ConversationViewModel: UITableViewDataSource {
             let cell: OutgoingMessageCell = tableView.dequeueReusableCell(withIdentifier: cellViewModel.itemType.rawValue) as! OutgoingMessageCell
             cell.setup(with: cellViewModel as! MessageDataListItem, withDelegate: self)
             return cell
-        case .typingMemeber:
+        case .typingMember:
             let cell: ParticipantTypingCell = tableView.dequeueReusableCell(withIdentifier: cellViewModel.itemType.rawValue) as! ParticipantTypingCell
             return cell
         case .outgoingMediaMessage:

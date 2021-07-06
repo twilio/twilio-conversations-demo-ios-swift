@@ -28,7 +28,7 @@ fileprivate class ParticipantDAOTest: XCTestCase {
     }
 
     func testInsertAndGet() {
-        participantDao.insertOrUpdateParticipants([buildTestParticipant()])
+        participantDao.upsertParticipants([buildTestParticipant()])
         let observable = participantDao.getParticipants(inConversation: exampleConversationSid )
         XCTAssert(observable.value?.count == 1)
     }
@@ -36,10 +36,10 @@ fileprivate class ParticipantDAOTest: XCTestCase {
     func testInsertAndUpdateIsTyping() {
         let participant = buildTestParticipant()
         let observable = participantDao.getParticipants(inConversation: exampleConversationSid )
-        participantDao.insertOrUpdateParticipants([participant])
+        participantDao.upsertParticipants([participant])
 
         participant.isTyping = true
-        participantDao.insertOrUpdateParticipants([participant])
+        participantDao.upsertParticipants([participant])
 
 
         XCTAssert(observable.value?.count == 1)
@@ -49,7 +49,7 @@ fileprivate class ParticipantDAOTest: XCTestCase {
     func testInsertAndGetIsTyping() {
         let participant = buildTestParticipant()
         participant.isTyping = true
-        participantDao.insertOrUpdateParticipants([participant])
+        participantDao.upsertParticipants([participant])
         let observable = participantDao.getTypingParticipants(inConversation: exampleConversationSid)
         XCTAssert(observable.value?.count == 1)
         XCTAssertTrue(observable.value!.first!.isTyping)
@@ -57,7 +57,7 @@ fileprivate class ParticipantDAOTest: XCTestCase {
 
     func testUpdateIsTyping() {
         let participant = buildTestParticipant()
-        participantDao.insertOrUpdateParticipants([participant])
+        participantDao.upsertParticipants([participant])
         let observable = participantDao.getTypingParticipants(inConversation: exampleConversationSid)
         participantDao.updateIsTyping(for: participant.sid, isTyping: true)
         let expectaction = XCTestExpectation(description: "We expect one callback to be called")

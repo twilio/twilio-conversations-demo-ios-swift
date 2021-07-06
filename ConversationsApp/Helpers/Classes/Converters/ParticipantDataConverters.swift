@@ -17,7 +17,7 @@ class ParticipantDataConverter: ParticipantDataConverterProtocol {
         return ParticipantDataItem(
             sid: participantSid,
             conversationSid: conversationSid,
-            identity: participant.identity!,
+            identity: participant.identity ?? "sms participant",
             type: Int16(participant.type.rawValue),
             attributes: participant.attributes()?.string,
             isTyping: false

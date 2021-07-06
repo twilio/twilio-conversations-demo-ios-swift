@@ -9,9 +9,8 @@ import TwilioConversationsClient
 
 protocol ConversationListActionListener: AnyObject {
 
-    func onJoinConversation(sid: String)
-    func onJoinConversation(uniqueName: String)
+    func onJoinConversation(with id: String)
     func onAddParticipant(participantIdentity: String, conversationSid: String)
-    func onDestroyConversation(sid: String)
+    func onLeaveConversation(sid: String)
     func onSetConversationNotificationLevel(sid: String, level: TCHConversationNotificationLevel)
 }

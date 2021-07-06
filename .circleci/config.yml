@@ -62,7 +62,7 @@ commands:
           command: echo "$GCLOUD_SETTINGS" | base64 --decode > gcloud_settings.json
       - run:
           name: Set Google Cloud target project
-          command: gcloud config set project rtd-shared-lib
+          command: gcloud config set project ${GCLOUD_PROJECT}
       - run:
           name: Authenticate with Google Cloud
           command: gcloud auth activate-service-account ${GCLOUD_PROJECT}@appspot.gserviceaccount.com --key-file=gcloud_settings.json --project=${GCLOUD_PROJECT}

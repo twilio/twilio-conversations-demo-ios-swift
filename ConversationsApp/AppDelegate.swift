@@ -18,33 +18,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         navigateToInitialScreen()
         UNUserNotificationCenter.current().delegate = self
         registerForAPNSNotifications()
-        registerForInternalNotifications()
         return true
     }
 
     func navigateToInitialScreen() {
         window = UIWindow()
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        var initialController: UIViewController
 
-        // Load latest credentials, if possible
-        if (try? ConversationsCredentialStorage.shared.loadLatestCredentials()) != nil {
-            initialController = storyboard.instantiateViewController(withIdentifier: "SplashVC")
-        } else {
-            initialController = storyboard.instantiateViewController(withIdentifier: "LoginVC")
-        }
-
-        window?.rootViewController = initialController
+        let signInController = SignInController()
+        window?.rootViewController = signInController.signInContainerVC
         window?.makeKeyAndVisible()
-    }
-
-    private func registerForInternalNotifications() {
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: "logoutRequired"), object: nil, queue: OperationQueue.main) { [weak self] notification in
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let loginController = storyboard.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
-            self?.window?.rootViewController = loginController
-            loginController.showExpiredSession()
-        }
     }
 
     func registerForPushNotifications() {

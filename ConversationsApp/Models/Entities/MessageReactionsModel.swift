@@ -12,8 +12,9 @@ enum ReactionType: String, Codable {
     case heart = "❤️"
     case laugh = "😂"
     case sad = "😢"
-    case thumbUp = "👍"
-    case thumbDown = "👎"
+    case pouting = "😡"
+    case thumbsUp = "👍"
+    case thumbsDown = "👎"
 
     var associatedValue: String {
         switch self {
@@ -23,10 +24,12 @@ enum ReactionType: String, Codable {
             return "laugh"
         case .sad:
             return "sad"
-        case .thumbUp:
-            return "thumbUp"
-        case .thumbDown:
-            return "thumbDown"
+        case .pouting:
+            return "pouting"
+        case .thumbsUp:
+            return "thumbs_up"
+        case .thumbsDown:
+            return "thumbs_down"
         }
     }
 
@@ -40,11 +43,14 @@ enum ReactionType: String, Codable {
         if value == ReactionType.sad.associatedValue {
             return .sad
         }
-        if value == ReactionType.thumbUp.associatedValue {
-            return .thumbUp
+        if value == ReactionType.pouting.associatedValue {
+            return .pouting
         }
-        if value == ReactionType.thumbDown.associatedValue {
-            return .thumbDown
+        if value == ReactionType.thumbsUp.associatedValue {
+            return .thumbsUp
+        }
+        if value == ReactionType.thumbsDown.associatedValue {
+            return .thumbsDown
         }
         return nil
     }
@@ -71,21 +77,21 @@ struct MessageReactionsModel: Encodable {
         return result
     }
     
-    mutating func tooggleReaction(recation: ReactionType, forParticipant participant: String) {
-        guard var participantSet = reactionDict[recation] else {
+    mutating func tooggleReaction(_ reaction: ReactionType, forParticipant participant: String) {
+        guard var participantSet = reactionDict[reaction] else {
             let participants = Set<String>(arrayLiteral: participant)
-            reactionDict[recation] = participants
+            reactionDict[reaction] = participants
             return
         }
         if (participantSet.contains(participant)) {
             participantSet.remove(participant)
             if (participantSet.isEmpty) {
-                reactionDict.removeValue(forKey: recation)
+                reactionDict.removeValue(forKey: reaction)
                 return
             }
         } else {
             participantSet.insert(participant)
         }
-        reactionDict[recation] = participantSet
+        reactionDict[reaction] = participantSet
     }
 }

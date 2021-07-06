@@ -36,7 +36,7 @@ class MessageDataItem {
     var mediaProperties: MediaMessageProperties? = nil
     var mediaStatus:  MediaStatus?
 
-    var attributesDictionnary: [String: Any] {
+    var attributesDictionary: [String: Any] {
         return [
             "uuid": self.uuid,
             "reactions": self.reactions.serializedDictionary
@@ -77,7 +77,7 @@ class MessageDataItem {
 }
 
 enum MessageDirection: Int {
-    case incomming = 0
+    case incoming = 0
     case outgoing = 1
 }
 

@@ -13,7 +13,7 @@ protocol ReactionListViewModelDelegate: AnyObject {
 }
 
 class ReactionListViewModel: NSObject {
-    weak var delegte: ReactionListViewModelDelegate?
+    weak var delegate: ReactionListViewModelDelegate?
 
     let reactionDAO: ReactionDAO
     let reactionType: String
@@ -40,7 +40,7 @@ class ReactionListViewModel: NSObject {
             self?.participants = reactions
                 .compactMap { $0.participant }
                 .compactMap { $0.getParticipantDataItem()}
-            self?.delegte?.onDataUpdated()
+            self?.delegate?.onDataUpdated()
         }
 
     }

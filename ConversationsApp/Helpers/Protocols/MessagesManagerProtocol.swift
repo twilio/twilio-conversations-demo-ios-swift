@@ -10,8 +10,8 @@ import Foundation
 protocol MessagesManagerProtocol: AnyObject {
 
     // MARK: - Properties
-    var conversationsProvider: ConversationsProvider? { get }
-    var conversationsRepository: ConversationsRepositoryProtocol? { get }
+    var conversationsProvider: ConversationsProvider { get }
+    var conversationsRepository: ConversationsRepositoryProtocol { get }
     var imageCache : ImageCache { get }
     var delegate: MessageManagerDelegate? { get set }
     var conversationSid: String! { get set }
@@ -21,7 +21,7 @@ protocol MessagesManagerProtocol: AnyObject {
     func retrySendMessageWithUuid(_ uuid: String, _ completion: ((Error?) -> Void)?)
     func notifyTypingOnConversation(_ conversationSid: String)
     func reactToMessage(withSid messageSid: String, withReaction reaction: ReactionType)
-    func sendMediaMessage(onConversation: String, inputStream: InputStream, mimeType:String, inputSize: Int)
+    func sendMediaMessage(toConversationWithSid: String, inputStream: InputStream, mimeType:String, inputSize: Int)
     func startMediaMessageDownloadForIndex(_ messageIndex: UInt)
     func retrySendMediaMessageWithUuid(_ messageUuid: String)
     func removeMessage(withIndex messageIndex: UInt, messageSid: String)

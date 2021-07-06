@@ -38,12 +38,12 @@ fileprivate class MessageDAOTest: XCTestCase {
         }
 
         // Insert values into cache
-        messagesDAO.insertOrUpdateMessages(generatedMessageList)
+        messagesDAO.upsertMessages(generatedMessageList)
 
         // Perform body update
         let newBody =  messageToUpdate.body! + "UPDATED"
         let updatedMessage = MessageDataItem(sid: messageToUpdate.sid, uuid: messageToUpdate.uuid, direction: messageToUpdate.direction, author: messageToUpdate.author, body: newBody, dateCreated: messageToUpdate.dateCreated, sendStatus: messageToUpdate.sendStatus, conversationSid: messageToUpdate.conversationSid, type: messageToUpdate.type)
-        messagesDAO.insertOrUpdateMessages([updatedMessage])
+        messagesDAO.upsertMessages([updatedMessage])
 
         let messagesReceived = expectation(description: "LocalCacheProvider should return message list")
 
@@ -65,7 +65,7 @@ fileprivate class MessageDAOTest: XCTestCase {
         let generatedMessageList = MessageItemGenerator.createDiverseMessageList(conversationSid: mockedConversationSid)
 
         // Insert values into cache
-        messagesDAO.insertOrUpdateMessages(generatedMessageList)
+        messagesDAO.upsertMessages(generatedMessageList)
 
         let messagesReceived = expectation(description: "LocalCacheProvider should return message list")
 
@@ -93,7 +93,7 @@ fileprivate class MessageDAOTest: XCTestCase {
         let deleteList: [String] = [deleteMessageSid]
 
         // Insert values into cache
-        messagesDAO.insertOrUpdateMessages(generatedMessageList)
+        messagesDAO.upsertMessages(generatedMessageList)
         messagesDAO.deleteMessages(by: deleteList)
 
         let messagesReceived = expectation(description: "LocalCacheProvider should return empty message list")
@@ -118,7 +118,7 @@ fileprivate class MessageDAOTest: XCTestCase {
             sid: "message-a",
             uuid: "uuid1",
             index: 0,
-            direction: .incomming,
+            direction: .incoming,
             author: "kevin",
             body: "I am testing reaction persistence",
             dateCreated: 1,
@@ -127,8 +127,8 @@ fileprivate class MessageDAOTest: XCTestCase {
             type: .text,
             reactions: MessageReactionsModel()
         )
-        message.reactions.tooggleReaction(recation: .heart, forParticipant: "participant-a")
-        messagesDAO.insertOrUpdateMessages([message])
+        message.reactions.tooggleReaction(.heart, forParticipant: "participant-a")
+        messagesDAO.upsertMessages([message])
 
         let retrieved = messagesDAO.getMessageWithSid("message-a")
         XCTAssertEqual(retrieved?.reactions?.count, 1)
@@ -147,7 +147,7 @@ fileprivate class MessageDAOTest: XCTestCase {
             sid: "message-a",
             uuid: "uuid1",
             index: 0,
-            direction: .incomming,
+            direction: .incoming,
             author: "kevin",
             body: "I am testing reaction persistence",
             dateCreated: 1,
@@ -156,12 +156,12 @@ fileprivate class MessageDAOTest: XCTestCase {
             type: .text,
             reactions: MessageReactionsModel()
         )
-        messagesDAO.insertOrUpdateMessages([message])
+        messagesDAO.upsertMessages([message])
 
         let messageList = messagesDAO.getObservableConversationMessages(by: mockedConversationSid)
         let messageUpdatesReceived = XCTestExpectation(description: "we should receive a message update after the reaction are added to the message")
-        message.reactions.tooggleReaction(recation: .heart, forParticipant: "participant-a")
-        messagesDAO.insertOrUpdateMessages([message])
+        message.reactions.tooggleReaction(.heart, forParticipant: "participant-a")
+        messagesDAO.upsertMessages([message])
 
         messageList.observe(with: self) { list in
             messageUpdatesReceived.fulfill()
@@ -177,7 +177,7 @@ fileprivate class MessageDAOTest: XCTestCase {
             sid: "message-a",
             uuid: "uuid1",
             index: 0,
-            direction: .incomming,
+            direction: .incoming,
             author: "kevin",
             body: "I am testing reaction persistence",
             dateCreated: 1,
@@ -186,15 +186,15 @@ fileprivate class MessageDAOTest: XCTestCase {
             type: .text,
             reactions: MessageReactionsModel()
         )
-        messagesDAO.insertOrUpdateMessages([message])
+        messagesDAO.upsertMessages([message])
 
         let messageList = messagesDAO.getObservableConversationMessages(by: mockedConversationSid)
         let messageUpdatesReceived = XCTestExpectation(description: "we should receive a message update after the reaction are added to the message")
-        message.reactions.tooggleReaction(recation: .heart, forParticipant: "participant-a")
-        messagesDAO.insertOrUpdateMessages([message])
+        message.reactions.tooggleReaction(.heart, forParticipant: "participant-a")
+        messagesDAO.upsertMessages([message])
 
-        message.reactions.tooggleReaction(recation: .sad, forParticipant: "participant-a")
-        messagesDAO.insertOrUpdateMessages([message])
+        message.reactions.tooggleReaction(.sad, forParticipant: "participant-a")
+        messagesDAO.upsertMessages([message])
 
         messageList.observe(with: self) { list in
             messageUpdatesReceived.fulfill()
@@ -211,7 +211,7 @@ fileprivate class MessageDAOTest: XCTestCase {
             sid: "message-a",
             uuid: "uuid1",
             index: 0,
-            direction: .incomming,
+            direction: .incoming,
             author: "kevin",
             body: "I am testing reaction persistence",
             dateCreated: 1,
@@ -220,18 +220,18 @@ fileprivate class MessageDAOTest: XCTestCase {
             type: .text,
             reactions: MessageReactionsModel()
         )
-        messagesDAO.insertOrUpdateMessages([message])
+        messagesDAO.upsertMessages([message])
 
         let messageList = messagesDAO.getObservableConversationMessages(by: mockedConversationSid)
         let messageUpdatesReceived = XCTestExpectation(description: "we should receive a message update after the reaction are added to the message")
-        message.reactions.tooggleReaction(recation: .heart, forParticipant: "participant-a")
-        messagesDAO.insertOrUpdateMessages([message])
+        message.reactions.tooggleReaction(.heart, forParticipant: "participant-a")
+        messagesDAO.upsertMessages([message])
 
-        message.reactions.tooggleReaction(recation: .sad, forParticipant: "participant-a")
-        messagesDAO.insertOrUpdateMessages([message])
+        message.reactions.tooggleReaction(.sad, forParticipant: "participant-a")
+        messagesDAO.upsertMessages([message])
 
-        message.reactions.tooggleReaction(recation: .sad, forParticipant: "participant-a")
-        messagesDAO.insertOrUpdateMessages([message])
+        message.reactions.tooggleReaction(.sad, forParticipant: "participant-a")
+        messagesDAO.upsertMessages([message])
 
         messageList.observe(with: self) { list in
             messageUpdatesReceived.fulfill()
@@ -248,7 +248,7 @@ fileprivate class MessageDAOTest: XCTestCase {
             sid: "message-a",
             uuid: "uuid1",
             index: 0,
-            direction: .incomming,
+            direction: .incoming,
             author: "kevin",
             body: "I am testing reaction persistence",
             dateCreated: 1,
@@ -259,7 +259,7 @@ fileprivate class MessageDAOTest: XCTestCase {
             mediaProperties: mediaProperties
         )
         let messageUpdatesReceived = XCTestExpectation(description: "we should receive a message update after the reaction are added to the message")
-        messagesDAO.insertOrUpdateMessages([message])
+        messagesDAO.upsertMessages([message])
         let messageList = messagesDAO.getObservableConversationMessages(by: mockedConversationSid)
 
         messageList.observe(with: self) { list in
@@ -279,7 +279,7 @@ fileprivate class MessageDAOTest: XCTestCase {
             sid: "message-a",
             uuid: "uuid1",
             index: 0,
-            direction: .incomming,
+            direction: .incoming,
             author: "kevin",
             body: "I am testing reaction persistence",
             dateCreated: 1,
@@ -293,7 +293,7 @@ fileprivate class MessageDAOTest: XCTestCase {
         observerFiredFullfilement.expectedFulfillmentCount = 2
 
         let messageList = messagesDAO.getObservableConversationMessages(by: mockedConversationSid)
-        messagesDAO.insertOrUpdateMessages([message])
+        messagesDAO.upsertMessages([message])
 
         var fullfilled = 0
         messageList.observe(with: self) { list in
@@ -308,7 +308,7 @@ fileprivate class MessageDAOTest: XCTestCase {
             fullfilled += 1
         }
         message.mediaProperties = MediaMessageProperties(mediaURL: URL(string: "https://testurl.com")!, messageSize: 0, uploadedSize: 0)
-        messagesDAO.insertOrUpdateMessages([message])
+        messagesDAO.upsertMessages([message])
     }
 
     func testGetListOfParticipantForReactionTypeOnMessage() {
@@ -319,7 +319,7 @@ fileprivate class MessageDAOTest: XCTestCase {
             sid: messageSid,
             uuid: "uuid1",
             index: 0,
-            direction: .incomming,
+            direction: .incoming,
             author: "kevin",
             body: "I am testing reaction persistence",
             dateCreated: 1,
@@ -329,26 +329,26 @@ fileprivate class MessageDAOTest: XCTestCase {
             reactions: MessageReactionsModel()
         )
         // Add message
-        messagesDAO.insertOrUpdateMessages([message])
+        messagesDAO.upsertMessages([message])
         // Create participants
         createParticipants(onConversation: mockedConversationSid)
         // Create a few thumb up from several participant on message
-        message.reactions.tooggleReaction(recation: .thumbUp, forParticipant: "participant-a")
-        message.reactions.tooggleReaction(recation: .thumbUp, forParticipant: "participant-b")
-        message.reactions.tooggleReaction(recation: .thumbUp, forParticipant: "participant-c")
-        messagesDAO.insertOrUpdateMessages([message])
+        message.reactions.tooggleReaction(.thumbsUp, forParticipant: "participant-a")
+        message.reactions.tooggleReaction(.thumbsUp, forParticipant: "participant-b")
+        message.reactions.tooggleReaction(.thumbsUp, forParticipant: "participant-c")
+        messagesDAO.upsertMessages([message])
         // Check that we have 3 reactions
         XCTAssertEqual(messagesDAO.getMessageWithSid(messageSid)?.reactions?.count, 3)
         
         // Get the list of participants who reacted to the message
-        let observableParticipants = reactionDAO.getReactions(onMessage: messageSid, withType: .thumbUp)
+        let observableParticipants = reactionDAO.getReactions(onMessage: messageSid, withType: .thumbsUp)
         XCTAssertEqual(observableParticipants.value?.count, 3)
 
         // Untoggle a reaction
-        message.reactions.tooggleReaction(recation: .thumbUp, forParticipant: "participant-c")
-        messagesDAO.insertOrUpdateMessages([message])
+        message.reactions.tooggleReaction(.thumbsUp, forParticipant: "participant-c")
+        messagesDAO.upsertMessages([message])
 
-        let secondRequestObserver = reactionDAO.getReactions(onMessage: messageSid, withType: .thumbUp)
+        let secondRequestObserver = reactionDAO.getReactions(onMessage: messageSid, withType: .thumbsUp)
         XCTAssertEqual(secondRequestObserver.value?.count, 2)
 
     }
@@ -362,7 +362,7 @@ fileprivate class MessageDAOTest: XCTestCase {
             sid: messageSid,
             uuid: "uuid1",
             index: 0,
-            direction: .incomming,
+            direction: .incoming,
             author: "kevin",
             body: "I am testing reaction persistence",
             dateCreated: 1,
@@ -372,14 +372,14 @@ fileprivate class MessageDAOTest: XCTestCase {
             reactions: MessageReactionsModel()
         )
         // Add message
-        messagesDAO.insertOrUpdateMessages([message])
+        messagesDAO.upsertMessages([message])
         // Create participants
         createParticipants(onConversation: mockedConversationSid)
         // Create a few thumb up from several participant on message
-        message.reactions.tooggleReaction(recation: .thumbUp, forParticipant: "participant-a")
-        message.reactions.tooggleReaction(recation: .thumbUp, forParticipant: "participant-b")
-        message.reactions.tooggleReaction(recation: .thumbUp, forParticipant: "participant-c")
-        messagesDAO.insertOrUpdateMessages([message])
+        message.reactions.tooggleReaction(.thumbsUp, forParticipant: "participant-a")
+        message.reactions.tooggleReaction(.thumbsUp, forParticipant: "participant-b")
+        message.reactions.tooggleReaction(.thumbsUp, forParticipant: "participant-c")
+        messagesDAO.upsertMessages([message])
         messagesDAO.deleteMessages(by: [messageSid])
         let messageList = messagesDAO.getObservableConversationMessages(by: mockedConversationSid).value
         XCTAssertEqual(0, messageList?.count)
@@ -390,6 +390,6 @@ fileprivate class MessageDAOTest: XCTestCase {
         let participantA = ParticipantDataItem(sid: "sid-a", conversationSid: conversation, identity: "participant-a", type: Int16(0), attributes: nil)
         let participantB = ParticipantDataItem(sid: "sid-b", conversationSid: conversation, identity: "participant-b", type: Int16(0), attributes: nil)
         let participantC = ParticipantDataItem(sid: "sid-c", conversationSid: conversation, identity: "participant-c", type: Int16(0), attributes: nil)
-        participantDAO.insertOrUpdateParticipants([participantA, participantB, participantC])
+        participantDAO.upsertParticipants([participantA, participantB, participantC])
     }
 }

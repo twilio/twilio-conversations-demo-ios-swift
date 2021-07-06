@@ -9,17 +9,27 @@ import UIKit
 
 class ConversationVC: UIViewController, UITableViewDelegate, ConversationViewModelDelegate, UITextFieldDelegate {
 
-    // MARK:- Interface Builder outlets
+    // MARK: - Interface Builder outlets
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var messageTextField: UITextField!
 
-    // MARK:- Properties
+    // MARK: - Properties
     var conversationSid: String = ""
 
     private var conversationViewModel: ConversationViewModel!
     private var initialLoad = false
 
-    // MARK:- UIViewController
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        hidesBottomBarWhenPushed = true
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        hidesBottomBarWhenPushed = true
+    }
+
+    // MARK: - UIViewController
     override func viewDidLoad() {
         guard !conversationSid.isEmpty else {
             showUnableToLoadConversationAlert()
@@ -27,12 +37,15 @@ class ConversationVC: UIViewController, UITableViewDelegate, ConversationViewMod
         }
         setupKeyboardListener()
         registerXIB()
+
         messageTextField.delegate = self
         tableView.delegate = self
-        conversationViewModel = ConversationViewModel(conversationSid: conversationSid)
+
         conversationViewModel.delegate = self
+
         tableView.dataSource = conversationViewModel
         tableView.separatorStyle = .none
+
         conversationViewModel.loadConversation()
     }
 
@@ -41,16 +54,22 @@ class ConversationVC: UIViewController, UITableViewDelegate, ConversationViewMod
                            forCellReuseIdentifier: MessagesTableCellViewType.outgoingMessage.rawValue)
         tableView.register(UINib(nibName: MessagesTableCellViewType.incomingMessage.rawValue, bundle: nil),
                            forCellReuseIdentifier: MessagesTableCellViewType.incomingMessage.rawValue)
-        tableView.register(UINib(nibName: MessagesTableCellViewType.typingMemeber.rawValue, bundle: nil),
-                           forCellReuseIdentifier:  MessagesTableCellViewType.typingMemeber.rawValue)
+        tableView.register(UINib(nibName: MessagesTableCellViewType.typingMember.rawValue, bundle: nil),
+                           forCellReuseIdentifier:  MessagesTableCellViewType.typingMember.rawValue)
         tableView.register(UINib(nibName: MessagesTableCellViewType.outgoingMediaMessage.rawValue, bundle: nil),
                            forCellReuseIdentifier:  MessagesTableCellViewType.outgoingMediaMessage.rawValue)
         tableView.register(UINib(nibName: MessagesTableCellViewType.incomingMediaMessage.rawValue, bundle: nil),
                            forCellReuseIdentifier:  MessagesTableCellViewType.incomingMediaMessage.rawValue)
     }
 
+    func setConversationViewModel(_ conversationViewModel: ConversationViewModel) {
+        self.conversationViewModel = conversationViewModel
+    }
+
     func onConversationUpdated() {
-        self.title = self.conversationViewModel.observableConversation?.value?.first?.friendlyName
+        DispatchQueue.main.async {
+            self.title = self.conversationViewModel.observableConversation?.value?.first?.friendlyName
+        }
     }
 
     func messageListUpdated(from: [MessageListItemCell], to: [MessageListItemCell]) {
@@ -84,7 +103,7 @@ class ConversationVC: UIViewController, UITableViewDelegate, ConversationViewMod
         }
     }
 
-    // MARK: UITextFieldDelegate
+    // MARK: - UITextFieldDelegate
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         sendMessage()
@@ -122,9 +141,7 @@ class ConversationVC: UIViewController, UITableViewDelegate, ConversationViewMod
         }
     }
 
-
-
-    // MARK:- setupKeyboardListener
+    // MARK: - setupKeyboardListener
     func setupKeyboardListener() {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -261,5 +278,4 @@ extension ConversationVC: UINavigationControllerDelegate, UIImagePickerControlle
         let inputStream = InputStream(data: imgData)
         conversationViewModel.sendMediaMessage(inputStream: inputStream, mimeType: "jpeg", inputSize: imgData.count)
     }
-
 }

@@ -38,14 +38,17 @@ class ConversationsClientWrapper: NSObject, ConversationsProvider, Conversations
                 TwilioConversationsClient.setLogLevel(.warning)
 
                 let properties = TwilioConversationsClientProperties()
+                properties.dispatchQueue = DispatchQueue(label: "TwilioConversationsDispatchQueue")
                 TwilioConversationsClient.conversationsClient(withToken: conversationsToken,
                                                               properties: properties,
                                                               delegate: self) { [weak self] result, client in
-                    if result.isSuccessful, let client = client  {
-                        self?.conversationsClient = client
-                        completion(.success)
-                    } else {
-                        completion(.failure(result.error!))
+                    DispatchQueue.main.async {
+                        if result.isSuccessful, let client = client  {
+                            self?.conversationsClient = client
+                            completion(.success)
+                        } else {
+                            completion(.failure(result.error!))
+                        }
                     }
                 }
             }
@@ -81,30 +84,6 @@ class ConversationsClientWrapper: NSObject, ConversationsProvider, Conversations
     func shutdown() {
         conversationsClient?.shutdown()
         conversationsClient = nil
-    }
-
-    func getMessage(parameters: MessageRetrievalRequestParameters, completion: @escaping (Result<TCHMessage, Error>) -> Void) {
-        guard let conversationsClient = conversationsClient else {
-            completion(.failure(DataFetchError.requiredDataCallsFailed))
-            return
-        }
-        conversationsClient.conversation(withSidOrUniqueName: parameters.conversationSid) { (result, conversation) in
-            guard result.isSuccessful, let conversation = conversation else {
-                completion(.failure(DataFetchError.requiredDataCallsFailed))
-                return
-            }
-            conversation.message(withIndex: NSNumber(value: parameters.messageIndex)) { (result, message) in
-                guard result.isSuccessful, let message = message else {
-                    completion(.failure(DataFetchError.requiredDataCallsFailed))
-                    return
-                }
-                if message.sid != parameters.messageSid {
-                    completion(.failure(DataFetchError.dataIsInconsistent))
-                    return
-                }
-                completion(.success(message))
-            }
-        }
     }
 
     // MARK: - ConversationsEventPropagator

@@ -75,7 +75,7 @@ public class PersistentMessageDataItem: NSManagedObject {
                       let participantIdendty = r.participant?.identity else {
                     break
                 }
-                itemReactions.tooggleReaction(recation: reactionType, forParticipant: participantIdendty)
+                itemReactions.tooggleReaction(reactionType, forParticipant: participantIdendty)
             }
         }
         
