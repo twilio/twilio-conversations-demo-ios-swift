@@ -18,15 +18,18 @@ What you'll minimally need to get started:
 
 [Generate GoogleService-Info.plist](https://firebase.google.com/docs/ios/setup).
 
+You may skip this step if you do not need the Firebase crash reporting. Find the line with `FirebaseApp.configure()` in the AppDelegate.swift file and remove it to disable Firebase.
+
 ### Set the value of `ACCESS_TOKEN_SERVICE_URL`
 
 Set the value of `ACCESS_TOKEN_SERVICE_URL` in scheme settings to point to a valid Access-Token server.
-It should be string which would be formatted into valid url
+It should be an URL of the backend function (see below) that would generate access tokens for your app.
+This function will be given `identity` and `password` as query parameters.
 
- ```
- // ACCESS_TOKEN_SERVICE_URL=https://some.token-generator.url/?identity=%@&password=%@
- String(format: Env["ACCESS_TOKEN_SERVICE_URL"], identity, password)
- ```
+```
+ACCESS_TOKEN_SERVICE_URL=https://some.token-generator.url/
+# The resulting url will be https://some.token-generator.url/?identity=user&password=user_password
+```
 
 This token generator should return HTTP 401 if case of invalid credentials.
 
@@ -44,9 +47,14 @@ let users = {
     user01: "password01"  !!! CHANGE THE PASSWORD AND REMOVE THIS NOTE !!!
 };
 
+let response = new Twilio.Response();
+let headers = {
+    'Access-Control-Allow-Origin': '*',
+  };
+
 exports.handler = function(context, event, callback) {
+    response.setHeaders(headers);
     if (!event.identity || !event.password) {
-        let response = new Twilio.Response();
         response.setStatusCode(401);
         response.setBody("No credentials");
         callback(null, response);
@@ -54,13 +62,12 @@ exports.handler = function(context, event, callback) {
     }
 
     if (users[event.identity] != event.password) {
-        let response = new Twilio.Response();
         response.setStatusCode(401);
         response.setBody("Wrong credentials");
         callback(null, response);
         return;
     }
-    
+
     let AccessToken = Twilio.jwt.AccessToken;
     let token = new AccessToken(
       context.ACCOUNT_SID,
@@ -74,7 +81,9 @@ exports.handler = function(context, event, callback) {
     grant.pushCredentialSid = context.PUSH_CREDENTIAL_SID; 
     token.addGrant(grant);
 
-    callback(null, token.toJwt());
+    response.setStatusCode(200);
+    response.setBody(token.toJwt());
+    callback(null, response);
 };
 ```
 5. Save the function

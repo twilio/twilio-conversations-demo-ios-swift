@@ -11,6 +11,5 @@ protocol ConversationListObserver: AnyObject {
 
     func onDataChanged()
     func onDisplayError(_ error: Error)
-    func onLogout()
     func onNotificationTap()
 }

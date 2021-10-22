@@ -9,10 +9,11 @@ import Foundation
 import CoreData
 
 protocol MessageDAO {
+
     func getObservableMessageWithUuid(_ messageUUID: String) -> ObservableFetchRequestResult<PersistentMessageDataItem>
     func getObservableConversationMessages(by sid: String) -> ObservableFetchRequestResult<PersistentMessageDataItem>
     func deleteMessages(by messageSids: [String])
-    func insertOrUpdateMessages(_ items: [MessageDataItem])
+    func upsertMessages(_ items: [MessageDataItem])
     func getMessageWithSid(_ sid: String) -> PersistentMessageDataItem?
     func getMessageWithIndex(messageIndex: NSNumber, onConversation: String) -> PersistentMessageDataItem?
 }
@@ -40,7 +41,7 @@ class MessageDAOImpl: BaseDAO, MessageDAO {
         return ObservableFetchRequestResult<PersistentMessageDataItem>(with: fetchRequest)
     }
 
-    func insertOrUpdateMessages(_ items: [MessageDataItem]) {
+    func upsertMessages(_ items: [MessageDataItem]) {
         objc_sync_enter(self)
         defer { objc_sync_exit(self) }
 

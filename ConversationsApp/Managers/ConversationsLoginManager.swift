@@ -44,10 +44,13 @@ class ConversationsLoginManager: LoginManager {
             let latestCredentials = try? conversationsCredentialStorage.loadLatestCredentials(),
             let pass = try? latestCredentials.readPassword()
         else {
+            print("Saved credentials failed, erasing")
             try? conversationsCredentialStorage.deleteCredentials()
             completion(.failure(LoginError.accessDenied))
             return
         }
+        
+        print("Signing in using saved credentials")
 
         signIn(identity: latestCredentials.account, password: pass) { [weak self] result in
             if case .failure(LoginError.accessDenied) = result {

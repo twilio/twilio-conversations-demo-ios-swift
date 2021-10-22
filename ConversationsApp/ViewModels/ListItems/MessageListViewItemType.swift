@@ -8,11 +8,13 @@
 import Foundation
 
 protocol MessageListItemCell {
+
     var itemType: MessagesTableCellViewType { get }
 }
 
 enum MessagesTableCellViewType: String {
-    case typingMemeber = "ParticipantTypingCell"
+
+    case typingMember = "ParticipantTypingCell"
     case incomingMessage = "IncomingMessageCell"
     case outgoingMessage = "OutgoingMessageCell"
     case outgoingMediaMessage = "OutgoingMediaMessageCell"
@@ -20,7 +22,8 @@ enum MessagesTableCellViewType: String {
 }
 
 struct TypingParticipantViewModel: MessageListItemCell {
-    let itemType: MessagesTableCellViewType = .typingMemeber
+
+    let itemType: MessagesTableCellViewType = .typingMember
     let participant: ParticipantDataItem
 }
 

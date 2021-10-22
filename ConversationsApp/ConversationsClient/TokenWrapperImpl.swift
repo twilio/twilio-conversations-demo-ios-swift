@@ -9,24 +9,8 @@ import Foundation
 
 extension TokenWrapper {
 
-    static func getTokenUrlFromEnv(identity: String, password: String) -> URL? {
-        guard let serviceUrlTemplate = ProcessInfo.processInfo.environment["ACCESS_TOKEN_SERVICE_URL"] else {
-            return nil
-        }
-
-        let urlString = String(format: serviceUrlTemplate, identity, password.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "")
-
-        return URL(string: urlString)
-    }
-
-    static func getTokenUrlFromDefaults(identity: String, password: String) -> URL? {
-        // Get token service absolute URL from settings
-        guard let tokenServiceUrl = UserDefaults.standard.string(forKey: "TOKEN_SERVICE_URL") else {
-            return nil
-        }
-
-        // Generate request endpoint for token retrieval
-        guard var urlComponents = URLComponents(string: tokenServiceUrl) else {
+    private static func constructLoginUrl(_ url: String, identity: String, password: String) -> URL? {
+        guard var urlComponents = URLComponents(string: url) else {
             return nil
         }
 
@@ -37,6 +21,21 @@ extension TokenWrapper {
         urlComponents.queryItems = queryItems
 
         return urlComponents.url
+    }
+
+    static func getTokenUrlFromEnv(identity: String, password: String) -> URL? {
+        guard let tokenServiceUrl = ProcessInfo.processInfo.environment["ACCESS_TOKEN_SERVICE_URL"] else {
+            return nil
+        }
+        return constructLoginUrl(tokenServiceUrl, identity: identity, password: password)
+    }
+
+    static func getTokenUrlFromDefaults(identity: String, password: String) -> URL? {
+        // Get token service absolute URL from settings
+        guard let tokenServiceUrl = UserDefaults.standard.string(forKey: "ACCESS_TOKEN_SERVICE_URL") else {
+            return nil
+        }
+        return constructLoginUrl(tokenServiceUrl, identity: identity, password: password)
     }
 
     static func getConversationsAccessToken(identity: String, password: String, completion: @escaping (Result<String, LoginError>) -> Void) {

@@ -11,39 +11,44 @@ class ParticipantListManager: ParticipantListManagerProtocol {
 
     // MARK: Properties
 
-    private(set) weak var conversationsRepository: ConversationsRepositoryProtocol?
-    private var momentaryConversationCache: MomentaryConversationCache?
+    private let conversationsProvider: ConversationsProvider
 
     // MARK: Intialization
 
-    init(conversationsProvider: ConversationsProvider = ConversationsClientWrapper.wrapper,
-         ConversationsRepository: ConversationsRepositoryProtocol = ConversationsRepository.shared) {
-        self.conversationsRepository = ConversationsRepository
-        self.momentaryConversationCache = MomentaryConversationCache(conversationsProvider: conversationsProvider)
+    init(conversationsProvider: ConversationsProvider = ConversationsClientWrapper.wrapper) {
+        self.conversationsProvider = conversationsProvider
     }
 
     // MARK: Methods
 
     func getParticipants(conversationSid: String, completion: @escaping (Result<[TCHParticipant], Error>) -> Void) {
-        guard let cache = momentaryConversationCache else {
-            completion(.failure(ActionError.unknown))
+        guard let client = conversationsProvider.conversationsClient else {
+            completion(.failure(DataFetchError.conversationsClientIsNotAvailable))
             return
         }
 
-        cache.getConversation(with: conversationSid) { error in
-            completion(.failure(ActionError.conversationNotAvailable))
-        } onSuccess: { conversation in
+        client.conversation(withSidOrUniqueName: conversationSid) { result, conversation in
+            guard let conversation = conversation else {
+                completion(.failure(DataFetchError.requiredDataCallsFailed))
+                return
+            }
+
             completion(.success(conversation.participants()))
         }
     }
 
     func remove(participant: TCHParticipant, fromConversationWith sidOrUniqueName: String, completion: @escaping (Error?) -> Void) {
-        guard let cache = momentaryConversationCache else {
-            completion(ActionError.unknown)
+        guard let client = conversationsProvider.conversationsClient else {
+            completion(DataFetchError.conversationsClientIsNotAvailable)
             return
         }
 
-        cache.getConversation(with: sidOrUniqueName, onError: completion) { conversation in
+        client.conversation(withSidOrUniqueName: sidOrUniqueName) { result, conversation in
+            guard let conversation = conversation else {
+                completion(DataFetchError.requiredDataCallsFailed)
+                return
+            }
+
             conversation.removeParticipant(participant) { result in
                 completion(result.error)
             }

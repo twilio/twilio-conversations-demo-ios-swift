@@ -8,7 +8,8 @@
 import Foundation
 import TwilioConversationsClient
 
-struct MediaUplpoadStatus {
+struct MediaUploadStatus {
+
     let totalBytes: Int
     let bytesUploaded: Int
     let url: URL?
@@ -21,8 +22,8 @@ struct MediaUplpoadStatus {
         return pct
     }
 
-    static func from(mediaProperties: MediaMessageProperties) ->  MediaUplpoadStatus {
-        return MediaUplpoadStatus(
+    static func from(mediaProperties: MediaMessageProperties) ->  MediaUploadStatus {
+        return MediaUploadStatus(
             totalBytes: mediaProperties.messageSize ,
             bytesUploaded: mediaProperties.uploadedSize,
             url: mediaProperties.mediaURL
@@ -45,19 +46,19 @@ class MessageDataListItem: MessageListItemCell {
     let type: TCHMessageType
     let reactions: [ReactionViewModel]
     let mediaSid: MediaSid?
-    var mediaProperties: MediaUplpoadStatus?
+    var mediaProperties: MediaUploadStatus?
     var mediaStatus: MediaStatus?
 
     var itemType: MessagesTableCellViewType {
         get {
             if (type ==  .text) {
-                if direction == .incomming {
+                if direction == .incoming {
                     return .incomingMessage
                 } else {
                     return .outgoingMessage
                 }
             } else {
-                if direction == .incomming {
+                if direction == .incoming {
                     return .incomingMediaMessage
                 } else {
                     return .outgoingMediaMessage
@@ -81,13 +82,14 @@ class MessageDataListItem: MessageListItemCell {
         self.mediaSid = item.mediaSid
         self.reactions = item.reactions.convertToViewModelArray()
         if let media = item.mediaProperties {
-            mediaProperties = MediaUplpoadStatus.from(mediaProperties: media)
+            mediaProperties = MediaUploadStatus.from(mediaProperties: media)
         }
         self.mediaStatus = item.mediaStatus
     }
 }
 
 fileprivate extension MessageReactionsModel {
+
     func convertToViewModelArray() -> [ReactionViewModel] {
         var reactionsArray = [ReactionViewModel]()
         for (reaction, count) in reactionsCount {

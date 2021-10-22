@@ -36,6 +36,5 @@ public class PersistentParticipantDataItem: NSManagedObject {
             type: self.type,
             attributes: self.attributes
         )
-
     }
 }

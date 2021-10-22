@@ -10,7 +10,8 @@ import CoreData
 import TwilioConversationsClient
 
 protocol ConversationDAO {
-    func insertOrUpdate(_ items: [ConversationDataItem])
+
+    func upsert(_ items: [ConversationDataItem])
     func delete(_ conversationSids: [String])
     func clearConversationList()
     func getObservableConversationList() -> ObservableFetchRequestResult<PersistentConversationDataItem>
@@ -20,17 +21,17 @@ protocol ConversationDAO {
 
 class ConversationDAOImpl: BaseDAO, ConversationDAO  {
 
-    func insertOrUpdate(_ items: [ConversationDataItem]) {
+    func upsert(_ items: [ConversationDataItem]) {
         objc_sync_enter(self)
         defer { objc_sync_exit(self) }
 
         items.forEach { (toBeInserted) in
             let cachedResult = getObservableConversations([toBeInserted.sid])
             if let toBeUpdated = cachedResult.value?.first(where: { $0.sid == toBeInserted.sid }) {
-                NSLog("[\(toBeInserted.sid)] will be updated")
+                print("[\(toBeInserted.sid)] will be updated")
                 toBeUpdated.update(with: toBeInserted)
             } else {
-                NSLog("[\(toBeInserted.sid)] will be inserted")
+                print("[\(toBeInserted.sid)] will be inserted")
                 let _ = PersistentConversationDataItem(with: toBeInserted, insertInto: coreDataContext)
             }
         }

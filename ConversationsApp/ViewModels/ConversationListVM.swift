@@ -14,32 +14,36 @@ class ConversationListViewModel: NSObject {
 
     private let conversationsRepository: ConversationsRepositoryProtocol
     private let conversationListManager: ConversationListManagerProtocol
-    private(set) var userConversationList: ObservableFetchRequestResult<PersistentConversationDataItem>?
-    private(set) var publicConversationList: ObservableFetchRequestResult<PersistentConversationDataItem>?
-    private(set) var filteredConversations: [ConversationListCellViewModel] = []
-    private(set) var userConversationCellViewModelMap: [String: ConversationListCellViewModel] = [:]
-    private(set) var publicConversationCellViewModelMap: [String: ConversationListCellViewModel] = [:]
+
+    private var conversationList: ObservableFetchRequestResult<PersistentConversationDataItem>?
+
+    private var conversationCellViewModelMap: [String: ConversationListCellViewModel] = [:]
+    private var conversationCellViewModelList: [ConversationListCellViewModel] = []
+
+    private(set) var presentedConversations: [ConversationListCellViewModel] = []
+
     public weak var delegate: ConversationListObserver?
 
-    private let conversationListOrder: (ConversationListCellViewModel, ConversationListCellViewModel) -> (Bool) = { first, second in
-        return first.lastMessageDate > second.lastMessageDate
-    }
-
-    private(set) var orderedConversationCellViewModels = [ConversationListCellViewModel]() {
+    var searchQuery: String? {
         didSet {
-            updateVisibleList()
+            updateFilteredList()
         }
     }
 
-    private var searchQuery: String? {
-        didSet {
-            let displayedList = getDisplayedConversationList()
-            if let searchQuery = searchQuery, !searchQuery.isEmpty {
-                filteredConversations = displayedList.filter { $0.friendlyName.range(of: searchQuery, options: .caseInsensitive) != nil }
-            } else {
-                filteredConversations = displayedList
-            }
-            delegate?.onDataChanged()
+    var isSearchQueryActive: Bool {
+        guard let searchQuery = searchQuery, !searchQuery.isEmpty else {
+            return false
+        }
+
+        return true
+    }
+
+    var isConversationListLoading: Bool {
+        switch conversationFetchStatus {
+        case .notStarted, .completed:
+            return false
+        default:
+            return true
         }
     }
 
@@ -51,7 +55,8 @@ class ConversationListViewModel: NSObject {
 
     // MARK: Intialization
 
-    init(conversationsRepository: ConversationsRepositoryProtocol = ConversationsRepository.shared, conversationListManager: ConversationListManagerProtocol = ConversationListManager()) {
+    init(conversationsRepository: ConversationsRepositoryProtocol = ConversationsRepository.shared,
+         conversationListManager: ConversationListManagerProtocol = ConversationListManager()) {
         self.conversationsRepository = conversationsRepository
         self.conversationListManager = conversationListManager
         super.init()
@@ -70,17 +75,18 @@ class ConversationListViewModel: NSObject {
 
     // MARK: Functions
 
-    func createAndJoinConversation(friendlyName: String?) {
+    func createAndJoinConversation(friendlyName: String?, completion: ((Error?) -> Void)?) {
         conversationListManager.createAndJoinConversation(friendlyName: friendlyName) { (error) in
             if let error = error {
                 self.delegate?.onDisplayError(error)
             }
+            completion?(error)
         }
     }
 
     func reloadConversationList() {
-        self.loadConversationList()
-        self.listenForConversationListChanges()
+        loadConversationList()
+        listenForConversationListChanges()
     }
 
     func getConversationSidToNavigateTo() -> String? {
@@ -100,7 +106,8 @@ class ConversationListViewModel: NSObject {
 
     private func loadConversationList() {
         self.conversationsRepository.clearConversationList()
-        userConversationList = getConversationList()
+        conversationList?.removeObserver(self) // remove observer if it was set previously
+        conversationList = getConversationList()
     }
 
     private func getConversationList() -> ObservableFetchRequestResult<PersistentConversationDataItem> {
@@ -115,25 +122,20 @@ class ConversationListViewModel: NSObject {
         return resultHandle.data
     }
 
-    func getDisplayedConversationList() -> [ConversationListCellViewModel] {
-        return orderedConversationCellViewModels
-    }
-
     private func updateConversationCellViewModels(items: [ConversationDataItem]) {
         var viewModelList = createConversationCellViewModels(from: items)
 
         // Sort list
-        viewModelList.sort(by: conversationListOrder)
+        viewModelList.sort { $0.lastMessageDate > $1.lastMessageDate }
 
         // Create map for easy access
-        var viewModelMap: [String: ConversationListCellViewModel] = [:]
-        viewModelList.forEach {
-            viewModelMap[$0.sid] = $0
-            viewModelMap[$0.uniqueName] = $0
+        let viewModelMap = viewModelList.reduce(into: [:]) { result, item in
+            result[item.sid] = item
         }
 
-        userConversationCellViewModelMap = viewModelMap
-        orderedConversationCellViewModels = viewModelList
+        conversationCellViewModelMap = viewModelMap
+        conversationCellViewModelList = viewModelList
+        updateFilteredList()
     }
 
     private func createConversationCellViewModels(from items: [ConversationDataItem]) -> [ConversationListCellViewModel] {
@@ -144,7 +146,7 @@ class ConversationListViewModel: NSObject {
         }
 
         // Grabbing and setting user interaction state from previous displayed cells, if possible
-        let oldCells = userConversationCellViewModelMap
+        let oldCells = conversationCellViewModelMap
         for cellViewModel in createdCellViewModels {
             guard let oldCell = oldCells[cellViewModel.sid] else {
                 continue
@@ -155,169 +157,80 @@ class ConversationListViewModel: NSObject {
         return createdCellViewModels
     }
 
-    private func getConversationCellViewModel(at: Int) -> ConversationListCellViewModel? {
+    func getConversationCellViewModel(at: Int) -> ConversationListCellViewModel? {
         guard at >= 0 else {
             return nil
         }
 
-        guard at < orderedConversationCellViewModels.count else {
+        guard at < presentedConversations.count else {
             return nil
         }
-        return orderedConversationCellViewModels[at]
+        return presentedConversations[at]
+    }
+
+    func getConversationCellViewModel(by sid: String) -> ConversationListCellViewModel? {
+        return conversationCellViewModelMap[sid]
     }
 
     private func listenForConversationListChanges() {
-        userConversationList?.observe(with: self, { [weak self] list in
+        conversationList?.observe(with: self, { [weak self] list in
             self?.updateConversationCellViewModels(items: list?.compactMap { $0.getConversationDataItem() } ?? [])
         })
     }
 
     private func unsubscribeFromConversationListChanges() {
-        userConversationList?.removeObserver(self)
-        publicConversationList?.removeObserver(self)
+        conversationList?.removeObserver(self)
     }
 
-    private func isConversationListLoading() -> Bool {
-        let checkStatus: (RepositoryFetchStatus) -> (Bool) = { fetchStatus in
-            switch fetchStatus {
-            case .notStarted, .completed:
-                return false
-            default:
-                return true
-            }
-        }
-
-        return checkStatus(conversationFetchStatus)
-    }
-
-    private func updateVisibleList() {
-        if isSearchQueryActive() {
-            searchConversationList(contains: searchQuery)
+    private func updateFilteredList() {
+        if let searchQuery = searchQuery, !searchQuery.isEmpty {
+            presentedConversations = conversationCellViewModelList.filter { $0.name.range(of: searchQuery, options: .caseInsensitive) != nil }
         } else {
-            delegate?.onDataChanged()
+            presentedConversations = conversationCellViewModelList
         }
-    }
-
-    private func isSearchQueryActive() -> Bool {
-        guard let searchQuery = self.searchQuery, !searchQuery.isEmpty else {
-            return false
-        }
-
-        return true
-    }
-
-    func searchConversationList(contains: String?) {
-        searchQuery = contains
-    }
-
-    func getDisplayedConversationAt(index: Int) -> ConversationListCellViewModel {
-        let list = getDisplayedConversationList()
-        return list[index]
-    }
-
-    func signOut() {
-        try? ConversationsCredentialStorage.shared.deleteCredentials()
-        delegate?.onLogout()
-    }
-}
-
-extension ConversationListViewModel: UITableViewDataSource {
-
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if isConversationListLoading() {
-            return 1
-        } else if isSearchQueryActive() {
-            return filteredConversations.count
-        }
-
-        return getDisplayedConversationList().count
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if isConversationListLoading(),
-            let loadingCell = tableView.dequeueReusableCell(withIdentifier: "LoadingConversationListCell") as? LoadingConversationListCell {
-            loadingCell.startLoading()
-            return loadingCell
-        }
-
-        guard getDisplayedConversationList().count > 0 else {
-            return UITableViewCell(style: .default, reuseIdentifier: "EmptyCell")
-        }
-
-        let conversationCellViewModel: ConversationListCellViewModel
-        if isSearchQueryActive() {
-            conversationCellViewModel = filteredConversations[indexPath.row]
-        } else {
-            guard let retrievedCell = getConversationCellViewModel(at: indexPath.row) else {
-                return UITableViewCell(style: .default, reuseIdentifier: "EmptyCell")
-            }
-            conversationCellViewModel = retrievedCell
-        }
-
-        let cell = tableView.dequeueReusableCell(withIdentifier: "JoinedConversationCell") as! JoinedConversationListCell
-        cell.setup(with: conversationCellViewModel)
-        return cell
+        delegate?.onDataChanged()
     }
 }
 
 extension ConversationListViewModel: ConversationListActionListener {
+
     func onSetConversationNotificationLevel(sid: String, level: TCHConversationNotificationLevel) {
-        userConversationCellViewModelMap[sid]?.userInteractionState.isChangingNotificationLevel = true
-        publicConversationCellViewModelMap[sid]?.userInteractionState.isChangingNotificationLevel = true
+        conversationCellViewModelMap[sid]?.userInteractionState.isChangingNotificationLevel = true
         conversationListManager.setConversationNotificationLevel(sid: sid, level: level) { (error) in
             if let error = error {
                 self.delegate?.onDisplayError(error)
             }
-            self.userConversationCellViewModelMap[sid]?.userInteractionState.isChangingNotificationLevel = false
-            self.publicConversationCellViewModelMap[sid]?.userInteractionState.isChangingNotificationLevel = false
+            self.conversationCellViewModelMap[sid]?.userInteractionState.isChangingNotificationLevel = false
         }
     }
 
-    func onDestroyConversation(sid: String) {
-        userConversationCellViewModelMap[sid]?.userInteractionState.isDestroyingConversation = true
-        publicConversationCellViewModelMap[sid]?.userInteractionState.isDestroyingConversation = true
-        conversationListManager.destroyConversation(sid: sid) { (error) in
+    func onLeaveConversation(sid: String) {
+        conversationCellViewModelMap[sid]?.userInteractionState.isLeavingConversation = true
+        conversationListManager.leaveConversation(sid: sid) { (error) in
             if let error = error {
                 self.delegate?.onDisplayError(error)
             }
-            self.userConversationCellViewModelMap[sid]?.userInteractionState.isDestroyingConversation = false
-            self.publicConversationCellViewModelMap[sid]?.userInteractionState.isDestroyingConversation = false
+            self.conversationCellViewModelMap[sid]?.userInteractionState.isLeavingConversation = false
         }
     }
 
     func onAddParticipant(participantIdentity: String, conversationSid: String) {
-        userConversationCellViewModelMap[conversationSid]?.userInteractionState.isAddingParticipant = true
-        publicConversationCellViewModelMap[conversationSid]?.userInteractionState.isAddingParticipant = true
+        conversationCellViewModelMap[conversationSid]?.userInteractionState.isAddingParticipant = true
         conversationListManager.addParticipant(identity: participantIdentity, sid: conversationSid) { (error) in
             if let error = error {
                 self.delegate?.onDisplayError(error)
             }
-            self.userConversationCellViewModelMap[conversationSid]?.userInteractionState.isAddingParticipant = false
-            self.publicConversationCellViewModelMap[conversationSid]?.userInteractionState.isAddingParticipant = false
+            self.conversationCellViewModelMap[conversationSid]?.userInteractionState.isAddingParticipant = false
         }
     }
 
-    func onJoinConversation(sid: String) {
-        userConversationCellViewModelMap[sid]?.userInteractionState.isJoining.value = true
-        publicConversationCellViewModelMap[sid]?.userInteractionState.isJoining.value = true
-        conversationListManager.joinConversation(sid) { (error) in
+    func onJoinConversation(with id: String) {
+        conversationCellViewModelMap[id]?.userInteractionState.isJoining.value = true
+        conversationListManager.joinConversation(id) { (error) in
             if let error = error {
                 self.delegate?.onDisplayError(error)
             }
-            self.userConversationCellViewModelMap[sid]?.userInteractionState.isJoining.value = false
-            self.publicConversationCellViewModelMap[sid]?.userInteractionState.isJoining.value = false
-        }
-    }
-
-    func onJoinConversation(uniqueName: String) {
-        userConversationCellViewModelMap[uniqueName]?.userInteractionState.isJoining.value = true
-        publicConversationCellViewModelMap[uniqueName]?.userInteractionState.isJoining.value = true
-        conversationListManager.joinConversation(uniqueName) { (error) in
-            if let error = error {
-                self.delegate?.onDisplayError(error)
-            }
-            self.userConversationCellViewModelMap[uniqueName]?.userInteractionState.isJoining.value = false
-            self.publicConversationCellViewModelMap[uniqueName]?.userInteractionState.isJoining.value = false
+            self.conversationCellViewModelMap[id]?.userInteractionState.isJoining.value = false
         }
     }
 }

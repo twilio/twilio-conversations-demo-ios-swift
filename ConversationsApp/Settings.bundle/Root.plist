@@ -12,7 +12,7 @@
 			<key>Title</key>
 			<string>Token service URL</string>
 			<key>Key</key>
-			<string>TOKEN_SERVICE_URL</string>
+			<string>ACCESS_TOKEN_SERVICE_URL</string>
 			<key>DefaultValue</key>
 			<string>http://localhost</string>
 			<key>IsSecure</key>

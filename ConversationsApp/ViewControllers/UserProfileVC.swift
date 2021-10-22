@@ -90,4 +90,20 @@ class UserProfileVC: UIViewController, UITextFieldDelegate, UserProfileViewModel
     @IBAction func closeTapped(_ sender: UIButton) {
         self.dismiss(animated: true, completion:nil)
     }
+
+    @IBAction func onSignOut(_ sender: Any) {
+        // TODO: move it to appropriate place
+        try? ConversationsCredentialStorage.shared.deleteCredentials()
+
+        DispatchQueue.main.async {
+            let controller = SignInController()
+            UIView.transition(with: UIApplication.shared.delegate!.window!!, duration: 0.2, options: .transitionCrossDissolve) {
+                UIApplication.shared.delegate?.window??.rootViewController = controller.signInContainerVC
+            }
+
+            StatusViewController.activateShortLived(text: "Signed out successfully", type: .success, animate: false)
+
+            ConversationsClientWrapper.wrapper.shutdown()
+        }
+    }
 }

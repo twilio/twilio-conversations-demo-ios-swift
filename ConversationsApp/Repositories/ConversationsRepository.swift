@@ -55,27 +55,27 @@ class ConversationsRepository: NSObject, ConversationsRepositoryProtocol {
         let resultHandle = RepositoryResultHandle<PersistentConversationDataItem>(with: obervableFetchRequest)
         resultHandle.requestStatus.value = .fetching
 
-        self.conversationsProvider.conversationsClient?.conversation(withSidOrUniqueName: sid) { (result, conversation) in
-            guard
-                result.isSuccessful,
-                let conversation = conversation
-            else {
-                if result.error != nil {
-                    resultHandle.requestStatus.value = .error(DataFetchError.requiredDataCallsFailed)
-                }
+        retrieveConversation(sid) { conversation, error in
+            guard let conversation = conversation else {
+                resultHandle.requestStatus.value = .error(DataFetchError.requiredDataCallsFailed)
                 return
             }
+
             self.retreiveParticipantForConversation(conversation)
             conversation.updateStats(conversationDao: self.localCacheProvider.conversationDAO)
             resultHandle.requestStatus.value = .subscribing
             conversation.delegate = self
             resultHandle.requestStatus.value = .completed
         }
+
         return resultHandle
     }
 
-    func getMessages(for conversationSid: String, by pageSize: UInt) -> RepositoryResultHandle<PersistentMessageDataItem> {
+    func getObservableMessages(for conversationSid: String) -> ObservableFetchRequestResult<PersistentMessageDataItem> {
+        return localCacheProvider.messagesDAO.getObservableConversationMessages(by: conversationSid)
+    }
 
+    func getMessages(for conversationSid: String, by pageSize: UInt) -> RepositoryResultHandle<PersistentMessageDataItem> {
         let fetchRequest = localCacheProvider.messagesDAO.getObservableConversationMessages(by: conversationSid)
         let resultHandle = RepositoryResultHandle(with: fetchRequest)
 
@@ -88,12 +88,12 @@ class ConversationsRepository: NSObject, ConversationsRepositoryProtocol {
                     return
                 }
 
-                let items: [MessageDataItem] = messages.compactMap { self.messageDataConverter.convert(message: $0) }
+                let items = messages.compactMap { self.messageDataConverter.convert(message: $0) }
                 items.forEach {
-                    $0.direction = $0.author == self.conversationsProvider.conversationsClient?.user?.identity ? MessageDirection.outgoing : MessageDirection.incomming
+                    $0.direction = $0.author == self.conversationsProvider.conversationsClient?.user?.identity ? MessageDirection.outgoing : MessageDirection.incoming
                     $0.conversationSid = conversationSid
                 }
-                self.localCacheProvider.messagesDAO.insertOrUpdateMessages(items)
+                self.localCacheProvider.messagesDAO.upsertMessages(items)
                 resultHandle.requestStatus.value = .completed
             }
         }
@@ -116,11 +116,11 @@ class ConversationsRepository: NSObject, ConversationsRepositoryProtocol {
             message.conversationSid = conversationSid
             return message
         }
-        localCacheProvider.messagesDAO.insertOrUpdateMessages(messagesWithConversationSid)
+        localCacheProvider.messagesDAO.upsertMessages(messagesWithConversationSid)
     }
 
     func updateMessages(_ messages: [MessageDataItem]) {
-        localCacheProvider.messagesDAO.insertOrUpdateMessages(messages)
+        localCacheProvider.messagesDAO.upsertMessages(messages)
     }
 
     func deleteMessagesWithSids(_ messageSids: [String]) {
@@ -158,8 +158,10 @@ class ConversationsRepository: NSObject, ConversationsRepositoryProtocol {
                 return
             }
 
-            let conversationDataItems = conversations.compactMap { self.conversationDataConverter.convert(conversation: $0) }
-            self.localCacheProvider.conversationDAO.insertOrUpdate(conversationDataItems)
+            let conversationDataItems = conversations.compactMap { conversation in
+                self.conversationDataConverter.convert(conversation: conversation)
+            }
+            self.localCacheProvider.conversationDAO.upsert(conversationDataItems)
 
             DispatchQueue.main.sync {
                 resultHandle.requestStatus.value = .subscribing
@@ -167,6 +169,7 @@ class ConversationsRepository: NSObject, ConversationsRepositoryProtocol {
             DispatchQueue.global().async {
                 conversations.forEach {
                     $0.delegate = self
+                    _ = self.getMessages(for: $0.sid!, by: 20)
                 }
                 DispatchQueue.main.sync {
                     resultHandle.requestStatus.value = .completed
@@ -178,7 +181,6 @@ class ConversationsRepository: NSObject, ConversationsRepositoryProtocol {
     }
 
     private func retrieveConversation(_ conversationSid: String, completion: @escaping (TCHConversation?, Error?) -> Void) {
-        // TODO: use cached conversation
         conversationsProvider.conversationsClient?.conversation(withSidOrUniqueName: conversationSid) { (result, conversation) in
             guard result.isSuccessful, let conversation = conversation else {
                 completion(nil, DataFetchError.requiredDataCallsFailed)
@@ -196,7 +198,7 @@ class ConversationsRepository: NSObject, ConversationsRepositoryProtocol {
         let conversationParticipantList = conversation?.participants()
         if let toInsertOrUpdate =
             conversationParticipantList?.compactMap({ participant in participantDataConverter.participantDataItem(from: participant, conversationSid: conversationSid) }) {
-            localCacheProvider.participantDAO.insertOrUpdateParticipants(toInsertOrUpdate)
+            localCacheProvider.participantDAO.upsertParticipants(toInsertOrUpdate)
         }
     }
 }
@@ -212,7 +214,7 @@ extension ConversationsRepository: TCHConversationDelegate {
         else {
             // Insert conversation into cache, if it wasn't
             if let item = conversationDataConverter.convert(conversation: conversation) {
-                localCacheProvider.conversationDAO.insertOrUpdate([item])
+                localCacheProvider.conversationDAO.upsert([item])
             }
             return
         }
@@ -233,15 +235,15 @@ extension ConversationsRepository: TCHConversationDelegate {
         }
 
         cachedConversation.dateUpdated = conversation.dateUpdatedAsDate?.timeIntervalSince1970 ?? Date().timeIntervalSince1970
-        localCacheProvider.conversationDAO.insertOrUpdate([cachedConversation])
+        localCacheProvider.conversationDAO.upsert([cachedConversation])
     }
 
     func conversationsClient(_ client: TwilioConversationsClient, conversation: TCHConversation, message: TCHMessage, updated: TCHMessageUpdate) {
         if let messageDataItem = messageDataConverter.convert(message: message) {
-            messageDataItem.direction = message.author == self.conversationsProvider.conversationsClient?.user?.identity ? MessageDirection.outgoing : MessageDirection.incomming
+            messageDataItem.direction = message.author == self.conversationsProvider.conversationsClient?.user?.identity ? MessageDirection.outgoing : MessageDirection.incoming
             messageDataItem.sendStatus = MessageSendStatus.sent
             messageDataItem.conversationSid = conversation.sid
-            localCacheProvider.messagesDAO.insertOrUpdateMessages([messageDataItem])
+            localCacheProvider.messagesDAO.upsertMessages([messageDataItem])
         }
     }
 
@@ -251,10 +253,10 @@ extension ConversationsRepository: TCHConversationDelegate {
         }
 
         if let messageDataItem = messageDataConverter.convert(message: message) {
-            messageDataItem.direction = message.author == self.conversationsProvider.conversationsClient?.user?.identity ? MessageDirection.outgoing : MessageDirection.incomming
+            messageDataItem.direction = message.author == self.conversationsProvider.conversationsClient?.user?.identity ? MessageDirection.outgoing : MessageDirection.incoming
             messageDataItem.sendStatus = MessageSendStatus.sent
             messageDataItem.conversationSid = conversationSid
-            localCacheProvider.messagesDAO.insertOrUpdateMessages([messageDataItem])
+            localCacheProvider.messagesDAO.upsertMessages([messageDataItem])
         }
 
         conversation.updateStats(conversationDao: self.localCacheProvider.conversationDAO)
@@ -287,7 +289,7 @@ extension ConversationsRepository: TCHConversationDelegate {
               let participantToAdd = participantDataConverter.participantDataItem(from: participant, conversationSid: conversationSid) else {
             fatalError("Participant could not be converted, or conversation sid is nil")
         }
-        localCacheProvider.participantDAO.insertOrUpdateParticipants([participantToAdd])
+        localCacheProvider.participantDAO.upsertParticipants([participantToAdd])
         conversation.updateStats(conversationDao: self.localCacheProvider.conversationDAO)
     }
 
@@ -302,14 +304,14 @@ extension ConversationsRepository: TCHConversationDelegate {
     }
 }
 
-// MARK:- TwilioConversationsClientDelegate methods
+// MARK: - TwilioConversationsClientDelegate methods
 
 extension ConversationsRepository: TwilioConversationsClientDelegate {
 
     func conversationsClient(_ client: TwilioConversationsClient, conversationAdded conversation: TCHConversation) {
         conversation.delegate = self
         if let item = conversationDataConverter.convert(conversation: conversation) {
-            localCacheProvider.conversationDAO.insertOrUpdate([item])
+            localCacheProvider.conversationDAO.upsert([item])
         }
     }
 

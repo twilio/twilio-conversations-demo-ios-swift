@@ -12,13 +12,11 @@ class ConversationListManager: ConversationListManagerProtocol {
     // MARK: Properties
 
     private(set) var conversationsProvider: ConversationsProvider
-    private var momentaryConversationCache: MomentaryConversationCache?
 
     // MARK: Intialization
 
     init(conversationsProvider: ConversationsProvider = ConversationsClientWrapper.wrapper) {
         self.conversationsProvider = conversationsProvider
-        self.momentaryConversationCache = MomentaryConversationCache(conversationsProvider: conversationsProvider)
 
         if let devicePushToken = ConversationsRepository.shared.devicePushToken,
            let conversationsClient = conversationsProvider.conversationsClient {
@@ -31,7 +29,17 @@ class ConversationListManager: ConversationListManagerProtocol {
     // MARK: ConversationListManagerProtocol
 
     func joinConversation(_ sidOrUniqueName: String, completion: @escaping (Error?) -> Void) {
-        getCachedConversation(withSid: sidOrUniqueName, onError: completion) { conversation in
+        guard let client = conversationsProvider.conversationsClient else {
+            completion(DataFetchError.conversationsClientIsNotAvailable)
+            return
+        }
+
+        client.conversation(withSidOrUniqueName: sidOrUniqueName) { result, conversation in
+            guard let conversation = conversation else {
+                completion(DataFetchError.requiredDataCallsFailed)
+                return
+            }
+
             conversation.join { result in
                 completion(result.error)
             }
@@ -39,7 +47,17 @@ class ConversationListManager: ConversationListManagerProtocol {
     }
 
     func leaveConversation(sid: String, completion: @escaping (Error?) -> Void) {
-        getCachedConversation(withSid: sid, onError: completion) { conversation in
+        guard let client = conversationsProvider.conversationsClient else {
+            completion(DataFetchError.conversationsClientIsNotAvailable)
+            return
+        }
+
+        client.conversation(withSidOrUniqueName: sid) { result, conversation in
+            guard let conversation = conversation else {
+                completion(DataFetchError.requiredDataCallsFailed)
+                return
+            }
+
             conversation.leave { result in
                 completion(result.error)
             }
@@ -47,7 +65,17 @@ class ConversationListManager: ConversationListManagerProtocol {
     }
 
     func setConversationNotificationLevel(sid: String, level: TCHConversationNotificationLevel, completion: @escaping (Error?) -> Void) {
-        getCachedConversation(withSid: sid, onError: completion) { conversation in
+        guard let client = conversationsProvider.conversationsClient else {
+            completion(DataFetchError.conversationsClientIsNotAvailable)
+            return
+        }
+
+        client.conversation(withSidOrUniqueName: sid) { result, conversation in
+            guard let conversation = conversation else {
+                completion(DataFetchError.requiredDataCallsFailed)
+                return
+            }
+
             conversation.setNotificationLevel(level) { result in
                 completion(result.error)
             }
@@ -55,23 +83,53 @@ class ConversationListManager: ConversationListManagerProtocol {
     }
 
     func destroyConversation(sid: String, completion: @escaping (Error?) -> Void) {
-        getCachedConversation(withSid: sid, onError: completion) { conversation in
+        guard let client = conversationsProvider.conversationsClient else {
+            completion(DataFetchError.conversationsClientIsNotAvailable)
+            return
+        }
+
+        client.conversation(withSidOrUniqueName: sid) { result, conversation in
+            guard let conversation = conversation else {
+                completion(DataFetchError.requiredDataCallsFailed)
+                return
+            }
+
             conversation.destroy { result in
                 completion(result.error)
             }
         }
     }
 
-    func setConversationFriendlyName(sid: String, friendlyName: String?,  completion: @escaping (Error?) -> Void) {
-        getCachedConversation(withSid: sid, onError: completion) { conversation in
+    func setConversationFriendlyName(sid: String, friendlyName: String?, completion: @escaping (Error?) -> Void) {
+        guard let client = conversationsProvider.conversationsClient else {
+            completion(DataFetchError.conversationsClientIsNotAvailable)
+            return
+        }
+
+        client.conversation(withSidOrUniqueName: sid) { result, conversation in
+            guard let conversation = conversation else {
+                completion(DataFetchError.requiredDataCallsFailed)
+                return
+            }
+
             conversation.setFriendlyName(friendlyName) { result in
                 completion(result.error)
             }
         }
     }
 
-    func addParticipant(identity: String, sid: String,  completion: @escaping (Error?) -> Void) {
-        getCachedConversation(withSid: sid, onError: completion) { conversation in
+    func addParticipant(identity: String, sid: String, completion: @escaping (Error?) -> Void) {
+        guard let client = conversationsProvider.conversationsClient else {
+            completion(DataFetchError.conversationsClientIsNotAvailable)
+            return
+        }
+
+        client.conversation(withSidOrUniqueName: sid) { result, conversation in
+            guard let conversation = conversation else {
+                completion(DataFetchError.requiredDataCallsFailed)
+                return
+            }
+
             conversation.addParticipant(byIdentity: identity, attributes: nil) { result in
                 completion(result.error)
             }
@@ -84,7 +142,7 @@ class ConversationListManager: ConversationListManagerProtocol {
         ]
 
         guard let client = conversationsProvider.conversationsClient else {
-            completion(ActionError.unknown)
+            completion(DataFetchError.conversationsClientIsNotAvailable)
             return
         }
 
@@ -98,18 +156,5 @@ class ConversationListManager: ConversationListManagerProtocol {
                 completion(result.error)
             }
         }
-    }
-
-    // MARK: Helper methods
-
-    private func getCachedConversation(withSid sid: String,
-                                       onError: @escaping (Error?) -> Void,
-                                       onSuccess: @escaping (TCHConversation) -> Void) {
-        guard let cache = momentaryConversationCache else {
-            onError(ActionError.notAbleToRetrieveCachedMessage)
-            return
-        }
-
-        cache.getConversation(with: sid, onError: onError, onSuccess: onSuccess)
     }
 }

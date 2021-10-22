@@ -11,7 +11,7 @@ import CoreData
 protocol ParticipantDAO {
     func getParticipants(inConversation conversationSid: String) -> ObservableFetchRequestResult<PersistentParticipantDataItem>
     func getTypingParticipants(inConversation conversationSid: String) -> ObservableFetchRequestResult<PersistentParticipantDataItem>
-    func insertOrUpdateParticipants(_ participant: [ParticipantDataItem])
+    func upsertParticipants(_ participant: [ParticipantDataItem])
     func updateIsTyping(for participantSid: String, isTyping: Bool)
 }
 
@@ -41,7 +41,7 @@ class ParticipantDAOImpl: BaseDAO, ParticipantDAO {
         return ObservableFetchRequestResult<PersistentParticipantDataItem>(with: fetchRequest)
     }
     
-    func insertOrUpdateParticipants(_ participantsToUpdate: [ParticipantDataItem]) {
+    func upsertParticipants(_ participantsToUpdate: [ParticipantDataItem]) {
         objc_sync_enter(self)
         defer { objc_sync_exit(self) }
 

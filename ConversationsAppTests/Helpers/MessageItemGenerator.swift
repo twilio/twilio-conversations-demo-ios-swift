@@ -29,10 +29,10 @@ class MessageItemGenerator {
         let failedMedia = MessageDataItem(sid: "5", uuid: "5", direction: .outgoing, author: "5", body: "5", dateCreated: 5, sendStatus: .error, conversationSid: conversationSid, type: .media)
 
         // Incomming text
-        let receivedText = MessageDataItem(sid: "6", uuid: "6", direction: .incomming, author: "6", body: "6", dateCreated: 6, sendStatus: .sent, conversationSid: conversationSid, type: .text)
+        let receivedText = MessageDataItem(sid: "6", uuid: "6", direction: .incoming, author: "6", body: "6", dateCreated: 6, sendStatus: .sent, conversationSid: conversationSid, type: .text)
 
         // Incomming media
-        let receivedMedia = MessageDataItem(sid: "7", uuid: "7", direction: .incomming, author: "7", body: "7", dateCreated: 7, sendStatus: .sent, conversationSid: conversationSid, type: .media, mediaSid:"0", mediaProperties: MediaMessageProperties(mediaURL: mediaURL, messageSize: 0, uploadedSize: 0), mediaStatus: .downloaded )
+        let receivedMedia = MessageDataItem(sid: "7", uuid: "7", direction: .incoming, author: "7", body: "7", dateCreated: 7, sendStatus: .sent, conversationSid: conversationSid, type: .media, mediaSid:"0", mediaProperties: MediaMessageProperties(mediaURL: mediaURL, messageSize: 0, uploadedSize: 0), mediaStatus: .downloaded )
 
         return [outgoingText, sentText, failedText, outgoingMedia, sentMedia, failedMedia, receivedText, receivedMedia]
     }

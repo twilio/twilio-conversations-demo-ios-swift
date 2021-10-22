@@ -30,7 +30,7 @@ fileprivate class ConversationDAOTest: XCTestCase {
     func testDeleteConversations() {
         // Insert values into cache
         let list = ConversationItemGenerator.createDiverseConversationList()
-        conversationDAO.insertOrUpdate(list)
+        conversationDAO.upsert(list)
 
         let deleteList: [String] = list.map { $0.sid }
         conversationDAO.delete(deleteList)
@@ -49,7 +49,7 @@ fileprivate class ConversationDAOTest: XCTestCase {
     func testInsertConversation() {
         // Insert values into cache
         let list = ConversationItemGenerator.createDiverseConversationList()
-        conversationDAO.insertOrUpdate(list)
+        conversationDAO.upsert(list)
 
         let userConversationListReceived = expectation(description: "LocalCacheProvider should return user conversation list values")
 
@@ -65,7 +65,7 @@ fileprivate class ConversationDAOTest: XCTestCase {
     func testUpdateConversationWithEmptyCache() {
         // Try to insert values into cache with update
         let list = ConversationItemGenerator.createDiverseConversationList()
-        conversationDAO.insertOrUpdate(list)
+        conversationDAO.upsert(list)
 
         let userConversationListReceived = expectation(description: "LocalCacheProvider should return user conversation list values")
 
@@ -81,13 +81,13 @@ fileprivate class ConversationDAOTest: XCTestCase {
     func testUpdateConversation() {
         // Insert values into cache
         var list = ConversationItemGenerator.createDiverseConversationList()
-        conversationDAO.insertOrUpdate(list)
+        conversationDAO.upsert(list)
 
         // Update all item friendly names
         let newFriendlyName = "UPDATED"
         list.mutateEach{ $0.friendlyName = newFriendlyName }
 
-        conversationDAO.insertOrUpdate(list)
+        conversationDAO.upsert(list)
 
         let userConversationListReceived = expectation(description: "LocalCacheProvider should return user conversation list values")
 
@@ -129,10 +129,10 @@ fileprivate class ConversationDAOTest: XCTestCase {
         let list = ConversationItemGenerator.createDiverseConversationList()
 
         // Calling insert which should notify observer
-        conversationDAO.insertOrUpdate(list)
+        conversationDAO.upsert(list)
 
         // Calling update which should notify observer
-        conversationDAO.insertOrUpdate(list)
+        conversationDAO.upsert(list)
 
         // Calling clear which should notify observer
         conversationDAO.clearConversationList()

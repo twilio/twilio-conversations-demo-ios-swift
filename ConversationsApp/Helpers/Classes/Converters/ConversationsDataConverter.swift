@@ -40,7 +40,7 @@ extension MessageReactionsModel {
                     break
                 }
                 for (participantId) in participants {
-                    result.tooggleReaction(recation: reactionType, forParticipant: participantId)
+                    result.tooggleReaction(reactionType, forParticipant: participantId)
                 }
             }
         }

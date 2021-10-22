@@ -16,7 +16,4 @@ protocol ConversationsProvider: TwilioConversationsClientDelegate, TCHConversati
     func create(login: String, password: String, completion: @escaping (LoginResult) -> Void)
     func create(login: String, password: String, tokenWrapper: TokenWrapper.Type, completion: @escaping (LoginResult) -> Void)
     func shutdown()
-
-    // MARK:- Message data retrieval
-    func getMessage(parameters: MessageRetrievalRequestParameters, completion: @escaping (Result<TCHMessage, Error>) -> Void)
 }

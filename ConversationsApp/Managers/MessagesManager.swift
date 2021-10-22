@@ -14,28 +14,26 @@ protocol MessageManagerDelegate: AnyObject {
 
 class MessagesManager: MessagesManagerProtocol {
 
-    private(set) weak var conversationsProvider: ConversationsProvider?
-    private(set) weak var conversationsRepository: ConversationsRepositoryProtocol?
+    private(set) var conversationsProvider: ConversationsProvider
+    private(set) var conversationsRepository: ConversationsRepositoryProtocol
     private(set) var imageCache: ImageCache
     internal weak var delegate: MessageManagerDelegate?
-    private let messageManagerDispatch = DispatchQueue(label: "com.tiwlio.conversationsdemo.MessagesManager", qos: .userInitiated)
+    private let messageManagerDispatch = DispatchQueue(label: "com.twilio.conversationsdemo.MessagesManager", qos: .userInitiated)
 
-    private var momentaryConversationCache: MomentaryConversationCache?
     var conversationSid: String!
 
     
     // MARK: Intialization
     init(conversationsProvider: ConversationsProvider = ConversationsClientWrapper.wrapper,
-         ConversationsRepository: ConversationsRepositoryProtocol = ConversationsRepository.shared,
+         conversationsRepository: ConversationsRepositoryProtocol = ConversationsRepository.shared,
          imageCache: ImageCache = DefaultImageCache.shared) {
         self.conversationsProvider = conversationsProvider
-        self.conversationsRepository = ConversationsRepository
-        self.momentaryConversationCache = MomentaryConversationCache(conversationsProvider: conversationsProvider)
+        self.conversationsRepository = conversationsRepository
         self.imageCache = imageCache
     }
 
     func sendTextMessage(to conversationSid: String, with body: String, completion: @escaping (Error?) -> Void) {
-        guard let identity: String = conversationsProvider?.conversationsClient?.user?.identity else {
+        guard let identity: String = conversationsProvider.conversationsClient?.user?.identity else {
             return
         }
 
@@ -50,14 +48,15 @@ class MessagesManager: MessagesManagerProtocol {
                                                                sendStatus: MessageSendStatus.sending, conversationSid: conversationSid,
                                                                type: TCHMessageType.text)
 
-        conversationsRepository?.insertMessages([outgoingMessage], for: conversationSid)
+        conversationsRepository.insertMessages([outgoingMessage], for: conversationSid)
         sendMessage(outgoingMessage, completion: completion)
     }
     
 
     func retrySendMessageWithUuid(_ uuid: String, _ completion: ((Error?) -> Void)? = nil) {
-        guard let localMessageData = self.conversationsRepository?.getMessageWithUuid(uuid).data,
-              let localMessage = localMessageData.value?.first?.getMessageDataItem()else {
+        let localMessageData = self.conversationsRepository.getMessageWithUuid(uuid).data
+
+        guard let localMessage = localMessageData.value?.first?.getMessageDataItem() else {
             completion?(ActionError.notAbleToRetrieveCachedMessage)
             return
         }
@@ -66,20 +65,21 @@ class MessagesManager: MessagesManagerProtocol {
             return
         }
         localMessage.sendStatus = .sending
-        self.conversationsRepository?.updateMessages([localMessage])
-        self.sendMessage(localMessage)
+        conversationsRepository.updateMessages([localMessage])
+        sendMessage(localMessage)
     }
     
     
     // MARK: Helpers
 
     func notifyTypingOnConversation(_ conversationSid: String) {
-        momentaryConversationCache?.getConversation(with: conversationSid, onError: { error in
-            if let error = error {
-                self.delegate?.onMessageManagerError(error)
-            }
-        }) { conversation in
-            conversation.typing()
+        guard let client = conversationsProvider.conversationsClient else {
+            self.delegate?.onMessageManagerError(DataFetchError.conversationsClientIsNotAvailable)
+            return
+        }
+
+        client.conversation(withSidOrUniqueName: conversationSid) { result, conversation in
+            conversation?.typing()
         }
     }
 
@@ -87,14 +87,22 @@ class MessagesManager: MessagesManagerProtocol {
         guard let conversationSid = outgoingMessage.conversationSid,
               let messageOptions = TCHMessageOptions()
                 .withBody(outgoingMessage.body!)
-                .withAttributes(TCHJsonAttributes.init(dictionary: outgoingMessage.attributesDictionnary), completion: nil) else {
+                .withAttributes(TCHJsonAttributes.init(dictionary: outgoingMessage.attributesDictionary), completion: nil) else {
             completion?(ActionError.notAbleToBuildMessage)
             return
         }
 
-        momentaryConversationCache?.getConversation(with: conversationSid, onError: { error in
-            completion?(error)
-        }) { conversation in
+        guard let client = conversationsProvider.conversationsClient else {
+            self.delegate?.onMessageManagerError(DataFetchError.conversationsClientIsNotAvailable)
+            return
+        }
+
+        client.conversation(withSidOrUniqueName: conversationSid) { result, conversation in
+            guard result.isSuccessful, let conversation = conversation else {
+                completion?(DataFetchError.requiredDataCallsFailed)
+                return
+            }
+
             conversation.sendMessage(with: messageOptions) { (result, sentMessage) in
                 if let error = result.error {
                     print("Error encountered while sending message: \(error)")
@@ -105,7 +113,7 @@ class MessagesManager: MessagesManagerProtocol {
                     outgoingMessage.sendStatus = .sent
                     outgoingMessage.index = sentMessage!.index!.uintValue
                 }
-                self.conversationsRepository?.updateMessages([outgoingMessage])
+                self.conversationsRepository.updateMessages([outgoingMessage])
                 completion?(result.error)
             }
         }
@@ -113,17 +121,25 @@ class MessagesManager: MessagesManagerProtocol {
 
     func reactToMessage(withSid messageSid: String, withReaction reaction: ReactionType) {
         guard
-            let messageToSend = conversationsRepository?.getMessageWithSid(messageSid),
-            let userIdentity = conversationsProvider?.conversationsClient?.user?.identity
+            let messageToSend = conversationsRepository.getMessageWithSid(messageSid),
+            let userIdentity = conversationsProvider.conversationsClient?.user?.identity
         else {
             delegate?.onMessageManagerError(ActionError.messagesNotAvailable)
             return
         }
 
-        momentaryConversationCache?.getConversation(with: messageToSend.conversationSid!, onError: { _ in }) { conversation in
+        guard let client = conversationsProvider.conversationsClient else {
+            self.delegate?.onMessageManagerError(DataFetchError.conversationsClientIsNotAvailable)
+            return
+        }
+
+        client.conversation(withSidOrUniqueName: messageToSend.conversationSid!) { result, conversation in
+            guard let conversation = conversation else {
+                return
+            }
             conversation.message(withIndex: NSNumber(value: messageToSend.index)) { [weak self] result, message in
-                messageToSend.reactions.tooggleReaction(recation: reaction, forParticipant: userIdentity)
-                message?.setAttributes(TCHJsonAttributes(dictionary: messageToSend.attributesDictionnary)) { updateResult in
+                messageToSend.reactions.tooggleReaction(reaction, forParticipant: userIdentity)
+                message?.setAttributes(TCHJsonAttributes(dictionary: messageToSend.attributesDictionary)) { updateResult in
                     if (!updateResult.isSuccessful) {
                         guard let error = updateResult.error else {
                             self?.delegate?.onMessageManagerError(ActionError.unknown)
@@ -136,17 +152,26 @@ class MessagesManager: MessagesManagerProtocol {
         }
     }
 
-    func sendMediaMessage(onConversation: String, inputStream: InputStream, mimeType: String, inputSize: Int) {
-        guard let identity: String = conversationsProvider?.conversationsClient?.user?.identity else {
+    func sendMediaMessage(toConversationWithSid sid: String, inputStream: InputStream, mimeType: String, inputSize: Int) {
+        guard let identity: String = conversationsProvider.conversationsClient?.user?.identity else {
             return
         }
 
-        momentaryConversationCache?.getConversation(with: onConversation, onError: { _ in }) { [weak self] conversation in
-            self?.sendMediaMessage(onConversation: conversation,
-                                   author: identity,
-                                   inputStream: inputStream,
-                                   mimeType: mimeType,
-                                   inputSize: inputSize)
+        guard let client = conversationsProvider.conversationsClient else {
+            self.delegate?.onMessageManagerError(DataFetchError.conversationsClientIsNotAvailable)
+            return
+        }
+
+        client.conversation(withSidOrUniqueName: sid) { result, conversation in
+            guard let conversation = conversation else {
+                return
+            }
+
+            self.sendMediaMessage(onConversation: conversation,
+                                  author: identity,
+                                  inputStream: inputStream,
+                                  mimeType: mimeType,
+                                  inputSize: inputSize)
         }
     }
 
@@ -173,7 +198,7 @@ class MessagesManager: MessagesManagerProtocol {
 
             guard let mediaData = try? Data(contentsOf: url),
                   let messageOptions = TCHMessageOptions()
-                    .withAttributes(TCHJsonAttributes(dictionary: outgoingMessage.attributesDictionnary), completion: nil) else {
+                    .withAttributes(TCHJsonAttributes(dictionary: outgoingMessage.attributesDictionary), completion: nil) else {
                 self.delegate?.onMessageManagerError(ActionError.notAbleToBuildMessage)
                 return
             }
@@ -181,7 +206,7 @@ class MessagesManager: MessagesManagerProtocol {
             outgoingMessage.mediaProperties = MediaMessageProperties(mediaURL: url, messageSize: inputSize, uploadedSize: 0)
             outgoingMessage.mediaStatus = .uploading
             outgoingMessage.conversationSid = conversationSid
-            self.conversationsRepository?.updateMessages([outgoingMessage])
+            self.conversationsRepository.updateMessages([outgoingMessage])
 
             messageOptions.withMediaStream(
                 InputStream(data: mediaData),
@@ -197,7 +222,7 @@ class MessagesManager: MessagesManagerProtocol {
                                                                    uploadedSize: Int(bytes))
                     outgoingMessage.mediaProperties = updatedProperties
                     outgoingMessage.mediaStatus = .uploading
-                    self.conversationsRepository?.updateMessages([outgoingMessage])
+                    self.conversationsRepository.updateMessages([outgoingMessage])
                 },
                 onCompleted:  { (mediaSid) in
                     print("[MediaMessage] Upload completed for sid \(mediaSid)")
@@ -211,18 +236,18 @@ class MessagesManager: MessagesManagerProtocol {
 
             conversation.sendMessage(with: messageOptions) { (result, message) in
                 if !result.isSuccessful {
+                    print("[MediaMessage] Media message has failed to send")
+                    outgoingMessage.sendStatus = .error
+                    self.conversationsRepository.updateMessages([outgoingMessage])
+                } else {
                     print("[MediaMessage] Media message has been sent succesfully")
                     outgoingMessage.sendStatus = .sent
                     outgoingMessage.mediaSid = message?.mediaSid
-                    self.conversationsRepository?.updateMessages([outgoingMessage])
-                } else {
-                    print("[MediaMessage] Media message has been sent succesfully")
-                    outgoingMessage.sendStatus = .error
-                    self.conversationsRepository?.updateMessages([outgoingMessage])
+                    self.conversationsRepository.updateMessages([outgoingMessage])
                 }
             }
             outgoingMessage.sendStatus = .error
-            self.conversationsRepository?.updateMessages([outgoingMessage])
+            self.conversationsRepository.updateMessages([outgoingMessage])
 
         case .failure (let error):
             self.delegate?.onMessageManagerError(ActionError.writeToCacheError)
@@ -236,15 +261,21 @@ class MessagesManager: MessagesManagerProtocol {
             guard let self = self else {
                 return
             }
-            self.momentaryConversationCache?.getConversation(with: self.conversationSid, onError: { [weak self] _ in
-                self?.delegate?.onMessageManagerError(ActionError.notAbleToRetrieveCachedMessage)
-            }) { conversation in
-                guard let localMessageData = self.conversationsRepository?.getMessageWithUuid(messageUuid).data,
+
+            guard let client = self.conversationsProvider.conversationsClient else {
+                self.delegate?.onMessageManagerError(DataFetchError.conversationsClientIsNotAvailable)
+                return
+            }
+
+            client.conversation(withSidOrUniqueName: self.conversationSid) { result, conversation in
+                let localMessageData = self.conversationsRepository.getMessageWithUuid(messageUuid).data
+
+                guard let conversation = conversation,
                       let localMessage = localMessageData.value?.first?.getMessageDataItem(),
                       let localMediaUrl = localMessage.mediaProperties?.mediaURL,
                       let messageSize = localMessage.mediaProperties?.messageSize,
                       let messageOptions = TCHMessageOptions()
-                        .withAttributes(TCHJsonAttributes(dictionary: localMessage.attributesDictionnary), completion: nil),
+                        .withAttributes(TCHJsonAttributes(dictionary: localMessage.attributesDictionary), completion: nil),
                       let data = try? Data(contentsOf: localMediaUrl) else {
                     self.delegate?.onMessageManagerError(ActionError.notAbleToRetrieveCachedMessage)
                     return
@@ -253,7 +284,7 @@ class MessagesManager: MessagesManagerProtocol {
                 localMessage.sendStatus = .sending
                 // Reset the uploaded size to zero in case the first upload try was interrupted
                 localMessage.mediaProperties = MediaMessageProperties.init(mediaURL: localMediaUrl, messageSize: messageSize, uploadedSize: 0)
-                self.conversationsRepository?.updateMessages([localMessage])
+                self.conversationsRepository.updateMessages([localMessage])
 
                 messageOptions.withMediaStream(
                     InputStream(data: data),
@@ -268,7 +299,7 @@ class MessagesManager: MessagesManagerProtocol {
                                                                        messageSize: messageSize,
                                                                        uploadedSize: Int(bytes))
                         localMessage.mediaProperties = updatedProperties
-                        self.conversationsRepository?.updateMessages([localMessage])
+                        self.conversationsRepository.updateMessages([localMessage])
                     },
                     onCompleted:  { (mediaSid) in
                         print("Media message upload completed")
@@ -277,19 +308,19 @@ class MessagesManager: MessagesManagerProtocol {
                                                                        uploadedSize: messageSize)
                         localMessage.mediaProperties = updatedProperties
                         localMessage.mediaStatus = .uploaded
-                        self.conversationsRepository?.updateMessages([localMessage])
+                        self.conversationsRepository.updateMessages([localMessage])
                     })
 
                 conversation.sendMessage(with: messageOptions) { result, message in
                     if result.isSuccessful {
-                        print("Media message failed to be sent")
-                        localMessage.sendStatus = .error
-                    } else {
                         print("Media message Sent succesfully")
                         localMessage.sendStatus = .sent
                         localMessage.mediaSid = message?.mediaSid
+                    } else {
+                        print("Media message failed to be sent")
+                        localMessage.sendStatus = .error
                     }
-                    self.conversationsRepository?.updateMessages([localMessage])
+                    self.conversationsRepository.updateMessages([localMessage])
                 }
             }
         }
@@ -302,13 +333,21 @@ class MessagesManager: MessagesManagerProtocol {
                 return
             }
 
-            self.momentaryConversationCache?.getConversation(with: self.conversationSid, onError: { _ in }) { [weak self] conversation in
+            guard let client = self.conversationsProvider.conversationsClient else {
+                self.delegate?.onMessageManagerError(DataFetchError.conversationsClientIsNotAvailable)
+                return
+            }
+
+            client.conversation(withSidOrUniqueName: self.conversationSid) { result, conversation in
+                guard let conversation = conversation else {
+                    return
+                }
+
                 conversation.message(withIndex: NSNumber(value: messageIndex)) { (result, tchMessage) in
                     NSLog("[MediaMessage] startMediaMessageDownloadForIndex\(messageIndex) -> Get message result \(result) -> \(tchMessage.debugDescription) ")
-                    guard let self = self,
-                          let message = tchMessage,
+                    guard let message = tchMessage,
                           let messageSid = message.sid,
-                          let messageDataItem = self.conversationsRepository?.getMessageWithSid(messageSid) else {
+                          let messageDataItem = self.conversationsRepository.getMessageWithSid(messageSid) else {
                         return
                     }
 
@@ -320,13 +359,13 @@ class MessagesManager: MessagesManagerProtocol {
                     NSLog("[MediaMessage] We got what we need")
                     messageDataItem.conversationSid = self.conversationSid
                     messageDataItem.mediaStatus = .downloading
-                    self.conversationsRepository?.updateMessages([messageDataItem])
+                    self.conversationsRepository.updateMessages([messageDataItem])
 
                     message.getMediaContentTemporaryUrl { [weak self] _, urlString in
                         guard let url = URL(string: urlString ?? "invalid url" ) else {
                             NSLog("[MediaMessage] We got a wrong url from getMediaContentTemporaryUrl message with Index \(messageIndex)")
                             messageDataItem.mediaStatus = .error
-                            self?.conversationsRepository?.updateMessages([messageDataItem])
+                            self?.conversationsRepository.updateMessages([messageDataItem])
                             return
                         }
                         self?.imageCache.copyToAppCache(locatedAt: url) { cachedResult in
@@ -336,12 +375,12 @@ class MessagesManager: MessagesManagerProtocol {
                                     messageDataItem.mediaProperties =
                                         MediaMessageProperties(mediaURL: image.url, messageSize: Int(message.mediaSize), uploadedSize: Int(message.mediaSize))
                                     messageDataItem.mediaStatus = .downloaded
-                                    self?.conversationsRepository?.updateMessages([messageDataItem])
+                                    self?.conversationsRepository.updateMessages([messageDataItem])
                                     NSLog("[MediaMessage][cache] Download succes for message with Index: \(messageIndex)")
                                 }
                             case .failure(_):
                                 messageDataItem.mediaStatus = .error
-                                self?.conversationsRepository?.updateMessages([messageDataItem])
+                                self?.conversationsRepository.updateMessages([messageDataItem])
                                 NSLog("[MediaMessage][cache] Download error for message with Index: \(messageIndex)")
                             }
                         }
@@ -369,46 +408,64 @@ class MessagesManager: MessagesManagerProtocol {
 
     func removeMessage(withIndex messageIndex: UInt, messageSid: String) {
         messageManagerDispatch.async { [weak self] in
-            guard let _self = self,
-                  let conversationSid = self?.conversationSid else {
+            guard let self = self,
+                  let conversationSid = self.conversationSid else {
                 return
             }
-            let messageRetrievalRequest = MessageRetrievalRequestParameters(messageIndex: messageIndex, messageSid: messageSid, conversationSid: conversationSid)
-            _self.conversationsProvider?.getMessage(parameters: messageRetrievalRequest) { result in
-                switch result {
-                case .failure(let error):
-                    NSLog("[delete-message] Message not found, error \(error.localizedDescription)")
-                    _self.delegate?.onMessageManagerError(error)
-                case .success(let message):
-                    NSLog("[delete-message] Message found, starting deletion")
-                    _self.removeMessage(tchMessage: message, onConversationWithSid: conversationSid)
+
+            guard let client = self.conversationsProvider.conversationsClient else {
+                self.delegate?.onMessageManagerError(DataFetchError.conversationsClientIsNotAvailable)
+                return
+            }
+
+            client.conversation(withSidOrUniqueName: self.conversationSid) { result, conversation in
+                guard let conversation = conversation else {
+                    self.delegate?.onMessageManagerError(DataFetchError.requiredDataCallsFailed)
+                    return
+                }
+
+                conversation.message(withIndex: NSNumber(value: messageIndex)) { (result, message) in
+                    guard result.isSuccessful, let message = message else {
+                        self.delegate?.onMessageManagerError(DataFetchError.requiredDataCallsFailed)
+                        return
+                    }
+                    if message.sid != messageSid {
+                        self.delegate?.onMessageManagerError(DataFetchError.dataIsInconsistent)
+                        return
+                    }
+                    self.removeMessage(tchMessage: message, onConversationWithSid: conversationSid)
                 }
             }
         }
     }
 
     private func removeMessage(tchMessage message: TCHMessage, onConversationWithSid conversationSid: String) {
-        self.momentaryConversationCache?.getConversation(with: self.conversationSid, onError: { _ in }) {[weak self] conversation in
-            guard let messageSid = message.sid else {
+        guard let client = conversationsProvider.conversationsClient else {
+            self.delegate?.onMessageManagerError(DataFetchError.conversationsClientIsNotAvailable)
+            return
+        }
+
+        client.conversation(withSidOrUniqueName: conversationSid) { result, conversation in
+            guard let messageSid = message.sid,
+                  let conversation = conversation else {
                 return
             }
 
             conversation.remove(message) { tchResult in
                 if let error = tchResult.error {
-                    self?.delegate?.onMessageManagerError(error)
+                    self.delegate?.onMessageManagerError(error)
                     return
                 }
-                self?.conversationsRepository?.deleteMessagesWithSids([messageSid])
+                self.conversationsRepository.deleteMessagesWithSids([messageSid])
             }
         }
     }
 
     func isCurrentUserAuthorOf(messageWithSid sid: String) -> Bool {
-        guard let message = self.conversationsRepository?.getMessageWithSid(sid),
-              let identity: String = conversationsProvider?.conversationsClient?.user?.identity else {
+        guard let message = self.conversationsRepository.getMessageWithSid(sid),
+              let identity: String = conversationsProvider.conversationsClient?.user?.identity else {
             return false
         }
         return message.author == identity
     }
-
 }
