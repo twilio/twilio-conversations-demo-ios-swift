@@ -1416,7 +1416,7 @@
 			repositoryURL = "https://github.com/twilio/conversations-ios.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.3.0;
+				minimumVersion = 2.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

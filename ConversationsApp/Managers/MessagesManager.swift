@@ -87,7 +87,7 @@ class MessagesManager: MessagesManagerProtocol {
         guard let conversationSid = outgoingMessage.conversationSid,
               let messageOptions = TCHMessageOptions()
                 .withBody(outgoingMessage.body!)
-                .withAttributes(TCHJsonAttributes.init(dictionary: outgoingMessage.attributesDictionary), completion: nil) else {
+                .withAttributes(TCHJsonAttributes.init(dictionary: outgoingMessage.attributesDictionary), error: nil) else {
             completion?(ActionError.notAbleToBuildMessage)
             return
         }
@@ -198,7 +198,7 @@ class MessagesManager: MessagesManagerProtocol {
 
             guard let mediaData = try? Data(contentsOf: url),
                   let messageOptions = TCHMessageOptions()
-                    .withAttributes(TCHJsonAttributes(dictionary: outgoingMessage.attributesDictionary), completion: nil) else {
+                    .withAttributes(TCHJsonAttributes(dictionary: outgoingMessage.attributesDictionary), error: nil) else {
                 self.delegate?.onMessageManagerError(ActionError.notAbleToBuildMessage)
                 return
             }
@@ -275,7 +275,7 @@ class MessagesManager: MessagesManagerProtocol {
                       let localMediaUrl = localMessage.mediaProperties?.mediaURL,
                       let messageSize = localMessage.mediaProperties?.messageSize,
                       let messageOptions = TCHMessageOptions()
-                        .withAttributes(TCHJsonAttributes(dictionary: localMessage.attributesDictionary), completion: nil),
+                        .withAttributes(TCHJsonAttributes(dictionary: localMessage.attributesDictionary), error: nil),
                       let data = try? Data(contentsOf: localMediaUrl) else {
                     self.delegate?.onMessageManagerError(ActionError.notAbleToRetrieveCachedMessage)
                     return
