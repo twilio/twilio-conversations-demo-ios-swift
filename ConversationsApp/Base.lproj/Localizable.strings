@@ -1,0 +1,307 @@
+/* Access denied, invalid credentials */
+"Access denied, invalid credentials" = "Access denied, invalid credentials";
+
+/* Add someone to a conversation */
+"Add" = "Add";
+
+/* All sign in fields must be supplied */
+"All sign in fields must be supplied" = "All sign in fields must be supplied";
+
+/* An error occured during data load, some information might be missing */
+"An error occured during data load, some information might be missing" = "An error occured during data load, some information might be missing";
+
+/* An unknwon error occured */
+"An unknwon error occured" = "An unknwon error occured";
+
+/* Title for canceling current action */
+"Cancel" = "Cancel";
+
+/* Title for back button */
+"Back" = "Back";
+
+/* Placeholder for conversation name */
+"Conversation name" = "Conversation name";
+
+/* Placeholder for conversation unique name */
+"Conversation unique name" = "Conversation unique name";
+
+/* Could not encode login input */
+"Could not encode login input" = "Could not encode login input";
+
+/* Action for destroying conversation */
+"Destroy" = "Destroy";
+
+/* Alert title message for occured error */
+"Error" = "Error";
+
+/* Users identity */
+"Identity" = "Identity";
+
+/* Action for joining a conversation */
+"Join" = "Join";
+
+/* Title for joining conversation with unique name */
+"Join conversation by unique name" = "Join conversation by unique name";
+
+/* User of a conversation */
+"Participant" = "Participant";
+
+/* Users of a conversation */
+"Participants" = "Participants";
+
+/* action for muting conversation */
+"Mute" = "Mute";
+
+/* Acknowledgment that this error message was read */
+"OK" = "OK";
+
+/* Options on how to add new conversation */
+"Options" = "Options";
+
+/* Alert title message for occured error */
+"Sign in error" = "Sign in error";
+
+/* Supplied token service URL is invalid */
+"Supplied token service URL is invalid" = "Supplied token service URL is invalid";
+
+/* Token service is unavailable */
+"Token service is unavailable" = "Token service is unavailable";
+
+/* Token service URL was not supplied */
+"Token service URL was not supplied" = "Token service URL was not supplied";
+
+/* action for unmuting conversation */
+"Unmute" = "Unmute";
+
+/* User online state */
+"Online" = "Online";
+
+/* User offline state */
+"Offline" = "Offline";
+
+/* Title for time since user is a participant */
+"Participant Since" = "Participant Since";
+
+/* Title for user online/offline status */
+"Status" = "Status";
+
+/* Title for profile button */
+"profile.label" = "Profile";
+
+/* Title for debug tab item */
+"debug.label" = "Debug";
+
+/* Title for conversations tab item and navigation bar */
+"conversations.label" = "Conversations";
+
+/* Title for logout button */
+"Logout" = "Logout";
+
+/* Title for user identity label */
+"Identity" = "Identity";
+
+/* Title for user friendly name label */
+"Friendly Name" = "Friendly Name";
+
+/* Title for crash button */
+"Trigger app crash" = "Trigger app crash";
+
+/* Status banner message for connectivity issues */
+"status.error.connectivity" = "No internet connection.";
+
+/* Status banner message for signing out manually */
+"signin.status.signout" = "Signed out successfully.";
+
+/* Validation error message for incorrect user credentials */
+"signin.error.invalid_credentials" = "The username and password do not match our records. Re-enter your username or password and try again.";
+
+/* Label when last message shared by you or someone is an image*/
+"%@ conversations.image.sharing.label" = "%@ shared an image";
+
+/* Label when last message shared by you or someone is a fisle*/
+"%@ conversations.file.sharing.label" = "%@ shared a file";
+
+/* Label when last message delivery fails*/
+"conversations.failed.message.delivery.label" = "Message failed to send";
+
+/* Label indicating a muted conversation */
+"muted.conversation.label" = "This is a muted conversation";
+
+"notification.on.label" = "Notifications on";
+
+"notification.off.label" = "Notifications off";
+
+"conversation.left.label" = "You have left the Conversation";
+
+"leave.confirmation.title" = "Leave Conversation?";
+"leave.confirmation.description" = "By leaving the Conversation you will no longer have access to participants or Conversation history.";
+"leave.confirmation.action" = "Leave";
+
+/* No results found text*/
+"search.no_results.label" = "No results found";
+
+/* Different search term text*/
+"search.different_search_item.label" = "Try a different search term.";
+
+/* Error code text */
+"errorCode %@" = "Error code %@";
+
+/* Loading Text */
+"loading.text" = "Loading";
+
+/* Validation error message for missing password */
+"signin.error.missing_password" = "Enter a password to sign in.";
+
+/* Validation error message for missing username */
+"signin.error.missing_username" = "Enter a username to sign in.";
+
+/* Validation error message for missing all credentials */
+"signin.error.missing_credentials" = "Enter a username and password to sign in.";
+
+/* Call to action for the Sign-In button */
+"signin.button" = "Sign In";
+
+/* Placeholder text for Sign-In screen username field */
+"signin.placeholder.username" = "Username";
+
+/* Placeholder text for Sign-In screen password field */
+"signin.placeholder.password" = "Password";
+
+/* Status text whilst attempting to authenticate */
+"signin.inprogress.message" = "Signing in";
+
+// MARK: - Conversations List
+
+"conversations.empty.title" = "No Conversations";
+"conversations.empty.description" = "Conversations you create or are involved in will appear here.";
+"conversations.empty.action" = "Create new Conversation";
+"conversations.loading_error.buttonText" = "Try again";
+"conversations.search.label" = "Search for a Conversation...";
+
+// MARK: - Conversation
+"conversation.empty.title" = "Send a new message or start adding participants to this Conversation.";
+"conversation.participants.typing" = "participants are typing...";
+"conversation.participant.typing" = "is typing...";
+"conversation.compose.bar.placeholder" = "Add your message";
+
+"conversation.create.title" = "New Conversation";
+"conversation.create.field_name" = "Conversation name";
+"conversation.create.placeholder" = "Conversation title";
+"conversation.create.action" = "Create";
+"conversation.create.empty.description" = "Add a conversation name to create a conversation.";
+
+"conversation.settings.title" = "Settings";
+"conversation.settings.subtitle" = "Conversation details";
+"conversation.settings.edit.title" = "Edit Conversation name";
+"conversation.settings.edit.subtitle" = "Currently ";
+"conversation.settings.mute.title" = "Mute notifications";
+"conversation.settings.mute.subtitle" = "Turn off push notifications for this Conversation";
+"conversation.settings.unmute.title" = "Unmute notifications";
+"conversation.settings.unmute.subtitle" = "Turn on push notifications for this Conversation";
+"conversation.settings.leave.title" = "Leave Conversation";
+"conversation.settings.leave.subtitle" = "Leave and remove from your Conversations";
+"conversation.settings.empty.description" = "No participants yet";
+"conversation.settings.empty.action" = "Add a participant";
+"conversation.settings.participants.title" = "Participants ";
+"conversation.settings.status.notifications_enabled" = "Notifications on";
+"conversation.settings.status.notifications_disabled" = "Notifications off";
+"conversation.settings.rename.action" = "Save";
+"conversation.settings.rename.name.title" = "Conversation name";
+"conversation.settings.rename.name.placeholder" = "Conversation title";
+"conversation.settings.rename.title" = "Edit Conversation name";
+"conversation.settings.rename.name.error_blank" = "Add a conversation name to rename this conversation.";
+"conversation.settings.rename.error.title" = "Unable to save Conversation name";
+"conversation.settings.rename.error.description" = "Error code %@: %@";
+
+"conversation.status.message_copied" = "Message copied";
+"conversation.status.message_deleted" = "Message deleted";
+"conversation.status.participant_added" = "Participant added";
+"conversation.status.participant_removed" = "Participant removed";
+
+"conversation.unreadMessages.header" = "%@ new messages";
+"conversation.participant_count.singular" = "%@ participant";
+"conversation.participant_count.plural" = "%@ participants";
+
+// MARK: - Error dialogs
+"dialog.close" = "Close";
+"dialog.error_code.title" = "Error code %@";
+
+// MARK: - Participants
+"participant.add.title" = "Add participant";
+"participant.add.flow.title" = "%@ participant";
+"participant.add.chat.primary.title" = "User identity";
+"participant.add.non_chat.primary.title" = "%@ phone number";
+"participant.add.chat.primary.description" = "The identity used by the participant in Conversations.";
+"participant.add.sms.primary.description" = "The phone number of the participant.";
+"participant.add.whatsapp.primary.description" = "The WhatsApp phone number of the participant.";
+"participant.add.proxy.title" = "Proxy phone number";
+"participant.add.proxy.description" = "The Twilio phone number used by the participant in Conversations.";
+
+"participant.type.sms" = "SMS";
+"participant.type.chat" = "Chat";
+"participant.type.whatsapp" = "Whatsapp";
+
+"participant.type.smsParticipant" = "SMS participant";
+"participant.type.chatParticipant" = "Chat participant";
+"participant.type.whatsappParticipant" = "Whatsapp participant";
+
+"participant.remove.confirmation.title" = "Remove %@ from the Conversation?";
+"participant.remove.confirmation.description" = "This participant will no longer be able to send or receive messages to this Conversation.";
+"participant.remove.confirmation.action" = "Remove";
+"participant.remove.sheet.action" = "Remove participant";
+"participant.remove.error.title" = "Unable to remove participant";
+"participant.remove.error.description" = "Error code %@: %@";
+
+// MARK: - Notifications
+"notification.title.new_message" = "New message";
+"notification.title.added_to_conversation" = "Added to conversation";
+"notification.title.removed_from_conversation" = "Removed from conversation";
+"notification.title.not_supported_message_type" = "Not supported message type ";
+
+// MARK: - Message status
+"message.send.status.undefined" = "Undefined";
+"message.send.status.error" = "Error";
+"message.send.status.sending" = "Sending";
+"message.send.status.sent" = "Sent";
+
+// MARK: - Message details
+"message.details.copy" = "Copy";
+"message.details.share" = "Share...";
+"message.details.delivery_status" = "View Delivery Status";
+"message.details.delete" = "Delete";
+"message.details.delete_title" = "Delete message?";
+"message.details.delete_description" = "This cannot be undone.";
+
+// MARK: - Message attachments
+"message.attachment.add.title" = "Add Attachment";
+"message.attachment.add.photo" = "Photo Library";
+"message.attachment.add.camera" = "Camera";
+"message.attachment.preview.send" = "Send";
+"message.attachment.error.size" = "File size is too large. Please select another file with a smaller size.";
+"message.attachment.fallback_size" = "0 MB";
+
+//MARK: - Reactions Details Sheet
+"reactions.details.view.title" = "Reactions";
+
+//MARK: - Media
+"media.tapToOpen" = "Tap to open";
+"media.downloading.state" = "Downloading...";
+
+// MARK: - Profile
+"userProfile.editProfile" = "Edit profile";
+"userProfile.editFriendlyName" = "Edit your friendly name";
+"userProfile.signout" = "Sign out";
+"userProfile.signout.description" = "Sign out of your account";
+
+"userProfile.edit.title" = "Edit profile";
+"userProfile.edit.action" = "Save";
+"userProfile.edit.title" = "Friendly name";
+"userProfile.edit.error.empty" = "Add a friendly name.";
+
+"userProfile.logout.title" = "Are you sure you want to sign out?";
+"userProfile.logout.description" = "Once signed out you will need to sign in again to access your Conversations.";
+"userProfile.signout" = "Sign out";
+
+// MARK: - Debug
+
+"debug.app_version" = "Version %@ (Build %@)";

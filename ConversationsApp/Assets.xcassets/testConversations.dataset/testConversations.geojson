@@ -1,0 +1,35 @@
+[
+    {
+        "sid": "CHxxxx",
+        "friendlyName": "My first conversation",
+        "muted": false,
+        "participantCount": "2 participants",
+        "deliveryStatus": "sent",
+        "mediaPreview": "none",
+        "lastMessagePreview": "A long test message that I've posted just for you here, hello, can you hear me?",
+        "unreadMessageCount": 0,
+        "lastMessageDate": 1633718554.0
+    },
+    {
+        "sid": "CHyyyy",
+        "friendlyName": "My second conversation",
+        "muted": true,
+        "participantCount": "21 participant",
+        "deliveryStatus": "seen",
+        "mediaPreview": "none",
+        "lastMessagePreview": "Another very long message that I've posted just for you!",
+        "unreadMessageCount": 11,
+        "lastMessageDate": 1633719311.1
+    },
+    {
+        "sid": "CHzzzz",
+        "friendlyName": "My third conversation",
+        "muted": false,
+        "participantCount": "2 participants",
+        "deliveryStatus": "error",
+        "mediaPreview": "some",
+        "lastMessagePreview": "Nothing much",
+        "unreadMessageCount": 1,
+        "lastMessageDate": 1633719311.1
+    },
+]

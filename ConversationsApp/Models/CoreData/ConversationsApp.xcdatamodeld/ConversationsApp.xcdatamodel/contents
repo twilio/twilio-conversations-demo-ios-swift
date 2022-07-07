@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21E258" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="PersistentConversationDataItem" representedClassName="PersistentConversationDataItem" syncable="YES" codeGenerationType="class">
+        <attribute name="attributes" optional="YES" attributeType="String"/>
+        <attribute name="createdBy" optional="YES" attributeType="String"/>
+        <attribute name="dateCreated" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dateUpdated" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="friendlyName" optional="YES" attributeType="String"/>
+        <attribute name="lastMessageAuthor" optional="YES" attributeType="String"/>
+        <attribute name="lastMessageDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="lastMessagePreview" optional="YES" attributeType="String"/>
+        <attribute name="lastMessageSid" optional="YES" attributeType="String"/>
+        <attribute name="lastMessageType" optional="YES" attributeType="String"/>
+        <attribute name="lastReadMessageIndex" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="messagesCount" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="muted" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="participantsCount" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="sid" attributeType="String"/>
+        <attribute name="uniqueName" optional="YES" attributeType="String"/>
+        <attribute name="unreadMessagesCount" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="sid"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="PersistentMediaDataItem" representedClassName="PersistentMediaDataItem" syncable="YES" codeGenerationType="class">
+        <attribute name="category" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="contentType" attributeType="String"/>
+        <attribute name="conversationSid" optional="YES" attributeType="String"/>
+        <attribute name="filename" attributeType="String"/>
+        <attribute name="sid" attributeType="String"/>
+        <attribute name="size" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="messageSid" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PersistentMessageDataItem" inverseName="attachedMedia" inverseEntity="PersistentMessageDataItem"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="sid"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="PersistentMessageDataItem" representedClassName="PersistentMessageDataItem" syncable="YES" codeGenerationType="class">
+        <attribute name="attributes" optional="YES" attributeType="String"/>
+        <attribute name="author" attributeType="String"/>
+        <attribute name="body" attributeType="String"/>
+        <attribute name="conversationSid" attributeType="String"/>
+        <attribute name="dateCreated" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dateUpdated" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="direction" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="messageIndex" attributeType="Integer 64" defaultValueString="-1" usesScalarValueType="YES"/>
+        <attribute name="participantSid" attributeType="String"/>
+        <attribute name="sid" attributeType="String"/>
+        <attribute name="uuid" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="attachedMedia" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="PersistentMediaDataItem" inverseName="messageSid" inverseEntity="PersistentMediaDataItem"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="sid"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="PersistentParticipantDataItem" representedClassName="PersistentParticipantDataItem" syncable="YES" codeGenerationType="class">
+        <attribute name="attributes" optional="YES" attributeType="String"/>
+        <attribute name="conversationSid" attributeType="String"/>
+        <attribute name="identity" optional="YES" attributeType="String"/>
+        <attribute name="lastReadMessage" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="sid" attributeType="String"/>
+        <attribute name="type" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="sid"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <elements>
+        <element name="PersistentConversationDataItem" positionX="-218.484375" positionY="85.9375" width="128" height="284"/>
+        <element name="PersistentMediaDataItem" positionX="-225" positionY="225" width="128" height="134"/>
+        <element name="PersistentMessageDataItem" positionX="-63" positionY="90" width="128" height="209"/>
+        <element name="PersistentParticipantDataItem" positionX="-388.6484375" positionY="108.203125" width="128" height="119"/>
+    </elements>
+</model>

@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "check_double.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

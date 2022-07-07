@@ -1,0 +1,98 @@
+[
+    {
+        "sid": "IMc92da3fcfefa9daa196939fa2c3efa02787f8acf",
+        "uuid": "a1daf369-5d31-4795-983d-fe0b4e5d4cc1",
+        "index": 0,
+        "direction": 0,
+        "author": "email_participant@twilio.org",
+        "body": "This is a very long message text without any formatting but still pretty long like my size 42 shoes that I want to try on. This is a very long message text without any formatting but still pretty long like my size 42 shoes that I want to try on. This is a very long message text without any formatting but still pretty long like my size 42 shoes that I want to try on. This is a very long message text without any formatting but still pretty long like my size 42 shoes that I want to try on",
+        "dateCreated": 1633718554.0,
+        "dateUpdated": 1633718554.0
+    },
+    {
+        "sid": "IMda4bf86ac4bf2783fb747d39bfbf945035c4f75b",
+        "uuid": "60885edc-ac5c-48ec-b3cb-382d67a2b78b",
+        "index": 1,
+        "direction": 1,
+        "author": "Berkus",
+        "body": "Short text",
+        "dateCreated": 1633719311.1,
+        "dateUpdated": 1633719311.1
+    },
+    {
+        "sid": "IMc97a80276bea5aaca70d7ce79467b6e403ecadc7",
+        "uuid": "b8dd25a7-0f61-4298-9372-1f4cbcff26aa",
+        "index": 2,
+        "direction": 1,
+        "author": "Berkus",
+        "body": "A long very long text from me to you hello there",
+        "dateCreated": 1633719311.1,
+        "dateUpdated": 1633719311.1
+    },
+    {
+        "sid": "IMc97a80276bea5aaca71e7ce79467b6e403ebace1",
+        "uuid": "b8dd25a7-0f61-4298-9372-1f5fbffa21bd",
+        "index": 3,
+        "direction": 1,
+        "author": "Berkus",
+        "body": "",
+        "dateCreated": 1633719311.1,
+        "dateUpdated": 1633719311.1,
+        "attachedMedia": "{\"sid\": \"MEXXXXXXXXXXXXXXXXXXXXXXXXXXXXX111\", \"size\": 1200, \"contentType\": \"image/jpeg\", \"filename\": \"someImage\", \"category\" : 0}"
+    },
+    {
+        "sid": "IMc97a80276bea5aaca71e7ce79467b6e403ebace2",
+        "uuid": "b8dd25a7-0f61-4298-9372-1f5fbffa21be",
+        "index": 4,
+        "direction": 0,
+        "author": "walrus",
+        "body": "",
+        "dateCreated": 1633719311.1,
+        "dateUpdated": 1633719311.1,
+        "attachedMedia": "{\"sid\": \"MEXXXXXXXXXXXXXXXXXXXXXXXXXXXXX222\", \"size\": 600, \"contentType\": \"application/pdf\", \"filename\": \"someDocument\", \"category\" : 0}"
+    },
+    {
+        "sid": "IMc92da3fcfefa9daa196939fa2c3efa02787f8acf",
+        "uuid": "a1daf369-5d31-4795-983d-fe0b4e5d4cc1",
+        "index": 5,
+        "direction": 0,
+        "author": "email_participant@twilio.org",
+        "body": "This is a very long message text without any formatting but still pretty long like my size 42 shoes that I want to try on. This is a very long message text without any formatting but still pretty long like my size 42 shoes that I want to try on. This is a very long message text without any formatting but still pretty long like my size 42 shoes that I want to try on. This is a very long message text without any formatting but still pretty long like my size 42 shoes that I want to try on",
+        "dateCreated": 1633718554.0,
+        "dateUpdated": 1633718554.0,
+        "attributes": "{\"reactions\":{\"laugh\":[\"user01\",\"user00\"],\"sad\":[\"user02\",\"user00\"],\"heart\":[\"user00\"]}}"
+    },
+    {
+        "sid": "IMda4bf86ac4bf2783fb747d39bfbf945035c4f75b",
+        "uuid": "60885edc-ac5c-48ec-b3cb-382d67a2b78b",
+        "index": 6,
+        "direction": 1,
+        "author": "Berkus",
+        "body": "Short text",
+        "dateCreated": 1633719311.1,
+        "dateUpdated": 1633719311.1,
+        "attributes": "{\"reactions\":{\"laugh\":[\"user01\",\"user00\"],\"sad\":[\"user02\",\"user00\"],\"heart\":[\"user00\"]}}"
+    },
+    {
+        "sid": "IMc97a80276bea5aaca71e7ce79467b6e403ebace1",
+        "uuid": "b8dd25a7-0f61-4298-9372-1f5fbffa21bd",
+        "index": 7,
+        "direction": 1,
+        "author": "Berkus",
+        "body": "",
+        "dateCreated": 1633719311.1,
+        "dateUpdated": 1633719311.1,
+        "attributes": "{\"reactions\":{\"laugh\":[\"user01\",\"user00\"],\"sad\":[\"user02\",\"user00\"],\"heart\":[\"user00\"]}}"
+    },
+    {
+        "sid": "IMc97a80276bea5aaca71e7ce79467b6e403ebace1",
+        "uuid": "b8dd25a7-0f61-4298-9372-1f5fbffa21bd",
+        "index": 8,
+        "direction": 1,
+        "author": "Cecilia",
+        "body": "",
+        "dateCreated": 1633719311.1,
+        "dateUpdated": 1633719311.1,
+        "attachedMedia": "{\"sid\": \"MEXXXXXXXXXXXXXXXXXXXXXXXXXXXXX345\", \"size\": 700, \"contentType\": \"audio/mpeg3\", \"filename\": \"audio-example.mp3\", \"category\" : 0}"
+    }
+]

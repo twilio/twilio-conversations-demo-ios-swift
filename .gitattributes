@@ -1,0 +1,5 @@
+# Specify filepatterns you want to assign special attributes.
+*.pbxproj merge=union
+
+# Taken from here: https://stackoverflow.com/a/51612850
+*.strings diff

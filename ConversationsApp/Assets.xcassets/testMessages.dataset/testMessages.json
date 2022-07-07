@@ -1,0 +1,28 @@
+[
+    {
+        "sid": "MEc92da3fcfefa9daa196939fa2c3efa02787f8acf",
+        "uuid": "a1daf369-5d31-4795-983d-fe0b4e5d4cc1",
+        "index": 1,
+        "direction": "incoming",
+        "author": "email_participant@twilio.org",
+        "body": "This is a very long message text without any formatting but still pretty long like my size 42 shoes that I want to try on. This is a very long message text without any formatting but still pretty long like my size 42 shoes that I want to try on. This is a very long message text without any formatting but still pretty long like my size 42 shoes that I want to try on. This is a very long message text without any formatting but still pretty long like my size 42 shoes that I want to try on",
+        "dateCreated": "2021-10-08 21:42",
+        "sendStatus": "undefined",
+        "type": "text",
+        "mediaSid": "",
+        "mediaType": ""
+    },
+    {
+        "sid": "MEda4bf86ac4bf2783fb747d39bfbf945035c4f75b",
+        "uuid": "60885edc-ac5c-48ec-b3cb-382d67a2b78b",
+        "index": 2,
+        "direction": "outgoing",
+        "author": "Berkus",
+        "body": "Short text",
+        "dateCreated": "2021-10-08 21:55",
+        "sendStatus": "sent",
+        "type": "text",
+        "mediaSid": "",
+        "mediaType": ""
+    }
+]
