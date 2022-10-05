@@ -23,7 +23,7 @@ class ConversationViewModel: NSObject {
 
     private(set) var observableConversation: ObservableFetchRequestResult<PersistentConversationDataItem>?
     lazy private(set) var observableMessageList = conversationsRepository.getObservableMessages(for: conversationSid)
-    private(set) var observervableTypingMemberList: ObservableFetchRequestResult<PersistentParticipantDataItem>?
+    private(set) var observableTypingParticipantList: ObservableFetchRequestResult<PersistentParticipantDataItem>?
     private(set) var messageItems: [MessageListItemCell] = [] {
         didSet {
             self.delegate?.messageListUpdated(from: oldValue, to: messageItems)
@@ -40,7 +40,7 @@ class ConversationViewModel: NSObject {
 
     weak var delegate: ConversationViewModelDelegate?
 
-    // Initialize the Conversation
+    // MARK: Initialize the Conversation
     init(conversationSid: String, conversationsRepository: ConversationsRepositoryProtocol = ConversationsRepository.shared, messagesManager: MessagesManagerProtocol = MessagesManager()) {
         self.conversationSid = conversationSid
         self.conversationsRepository = conversationsRepository
@@ -68,7 +68,7 @@ class ConversationViewModel: NSObject {
         messagesManager.reactToMessage(withSid: sid, withReaction: reaction)
     }
 
-    // Deintialization
+    // Deinitialization
     deinit {
         // During transition, remove observers
         unsubscribeFromConversationChanges()
