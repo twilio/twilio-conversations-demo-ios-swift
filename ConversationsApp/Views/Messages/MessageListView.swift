@@ -330,8 +330,10 @@ struct MessageListView: View {
                     sendError = error
                     isShowingSendError = true
                 } else {
-                    viewModel.clearSelectedImage()
-                    textToSend = ""
+                    DispatchQueue.main.async {
+                        viewModel.clearSelectedImage()
+                        textToSend = ""
+                    }
                 }
             }
         }

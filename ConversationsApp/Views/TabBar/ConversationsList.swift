@@ -8,6 +8,7 @@
 
 import SwiftUI
 import Combine
+import TwilioConversationsClient
 
 struct ConversationsList: View {
     // MARK: Observables
@@ -37,32 +38,8 @@ struct ConversationsList: View {
                     } else {
                         if conversationManager.conversations.isEmpty {
                             if let error = appModel.conversationsError {
-                                VStack (alignment: .center) {
-                                    Image(systemName: "exclamationmark.square.fill")
-                                        .font(.system(size: 20))
-                                        .foregroundColor(Color("ErrorTextColor"))
-                                        .padding(EdgeInsets(top: 0, leading: 0, bottom: 4, trailing: 0))
-                                    if let errorCode = error.code {
-                                        Text("errorCode \(String(errorCode))")
-                                            .font(.system(size: 20, weight: .bold))
-                                    }
-                                    if let errorInfo = error.userInfo, let errorMessage = errorInfo["TCHErrorMsgKey"] as? String {
-                                        Text(errorMessage)
-                                            .font(.system(size: 16))
-                                            .foregroundColor(Color.textWeak)
-                                            .padding(EdgeInsets(top: 4, leading: 16, bottom: 16, trailing: 16))
-                                    }
-                                    Button(action: {
-                                        conversationManager.subscribeConversations(onRefresh: false)
-                                    }, label: {
-                                        Text("conversations.loading_error.buttonText")
-                                            .font(.system(size: 14, weight: .bold))
-                                            .padding(EdgeInsets(top: 0, leading: 16, bottom: 12, trailing: 16))
-                                    })
-                                    .padding(EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16))
-                                    .background(Color.primaryBackgroundColor)
-                                    .foregroundColor(Color.white)
-                                    .cornerRadius(4)
+                                ConversationsListErrorView(error: error) {
+                                    conversationManager.subscribeConversations(onRefresh: false)
                                 }
                             } else {
                                 ConversationsEmptyView(showingCreateConversationSheet: $showingCreateConversationSheet)
@@ -115,6 +92,38 @@ struct ConversationsList: View {
     
     init() {
         UITableView.appearance().backgroundColor = UIColor.inverseTextColor
+    }
+}
+
+struct ConversationsListErrorView: View {
+
+    var error: TCHError
+    var buttonAction: () -> Void
+
+    var body: some View {
+        VStack (alignment: .center) {
+            Image(systemName: "exclamationmark.square.fill")
+                .font(.system(size: 20))
+                .foregroundColor(Color("ErrorTextColor"))
+                .padding(EdgeInsets(top: 0, leading: 0, bottom: 4, trailing: 0))
+            Text("errorCode \(String(error.code))")
+                .font(.system(size: 20, weight: .bold))
+            if let errorMessage = error.userInfo["TCHErrorMsgKey"] as? String {
+                Text(errorMessage)
+                    .font(.system(size: 16))
+                    .foregroundColor(Color.textWeak)
+                    .padding(EdgeInsets(top: 4, leading: 16, bottom: 16, trailing: 16))
+            }
+            Button(action: buttonAction, label: {
+                Text("conversations.loading_error.buttonText")
+                    .font(.system(size: 14, weight: .bold))
+                    .padding(EdgeInsets(top: 0, leading: 16, bottom: 12, trailing: 16))
+            })
+            .padding(EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16))
+            .background(Color.primaryBackgroundColor)
+            .foregroundColor(Color.white)
+            .cornerRadius(4)
+        }
     }
 }
 
