@@ -34,8 +34,9 @@ extension PersistentParticipantDataItem {
             self.sid = participant.sid
             self.conversationSid = conversationSid
             self.identity = participant.identity
-            self.type = Int16(participant.type.rawValue)
-            
+            // TODO: Properly convert this channelType to a string, currently it is just a Swift enum and the channel string is hidden for Swift.
+            self.channel = String(describing: participant.channelType)
+
             if let attributes = participant.attributes() {
                 if attributes.isDictionary, let dictionary = attributes.dictionary {
                     do {
