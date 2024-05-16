@@ -39,7 +39,9 @@ struct ConversationsList: View {
                         if conversationManager.conversations.isEmpty {
                             if let error = appModel.conversationsError {
                                 ConversationsListErrorView(error: error) {
-                                    conversationManager.subscribeConversations(onRefresh: false)
+                                    Task {
+                                        conversationManager.subscribeConversations(onRefresh: false)
+                                    }
                                 }
                             } else {
                                 ConversationsEmptyView(showingCreateConversationSheet: $showingCreateConversationSheet)
@@ -54,7 +56,6 @@ struct ConversationsList: View {
                     NSLog("Setting predicate to '\(value)'")
                 }
                 .navigationBarTitle(NSLocalizedString("conversations.label", comment: "Title for navigation bar"), displayMode: .inline)
-                .navigationBarWith(backgroundColor: UIColor.primaryDarkestBackgroundColor, tintColor: UIColor.inverseTextColor)
                 .navigationBarItems(leading: Button(action: {
                     withAnimation {
                         filtering = true

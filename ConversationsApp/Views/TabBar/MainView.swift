@@ -36,12 +36,6 @@ class NavigationHelper : ObservableObject {
 // This is a central view. It shows either a sign in view or a TabBar with available tabs.
 struct MainView: View {    
     @EnvironmentObject var navigationHelper: NavigationHelper
-    
-    init() {
-      UITabBar.appearance().unselectedItemTintColor = UIColor.white
-      UITabBar.appearance().backgroundColor = UIColor.primaryDarkestBackgroundColor
-      UITabBar.appearance().backgroundImage = UIImage()
-    }
 
     @StateObject var appState: AppState = .init(current: .signin)
 

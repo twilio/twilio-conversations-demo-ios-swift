@@ -21,7 +21,6 @@ struct FileAttachmentSheet: View {
                 WebView(url: fileURL)
             }
             .navigationBarTitle(Text(filename), displayMode: .inline)
-            .navigationBarWith(backgroundColor: UIColor.lightBackgroundColor, tintColor: UIColor.textColor)
             .navigationBarItems(leading: Button(action: {
                 isPresented.toggle()
             }) {

@@ -59,7 +59,6 @@ struct AddParticipantSheet: View {
                 Spacer()
             }
             .navigationBarTitle(Text(getTitleFor(flow)), displayMode: .inline)
-            .navigationBarWith(backgroundColor: UIColor.lightBackgroundColor, tintColor: UIColor.textColor)
             .navigationBarItems(leading: Button(action: {
                 isPresented.toggle()
             }) {

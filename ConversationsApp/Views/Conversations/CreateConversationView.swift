@@ -27,7 +27,6 @@ struct CreateConversationView: View {
                 Spacer()
             }
             .navigationBarTitle(Text("conversation.create.title"), displayMode: .inline)
-            .navigationBarWith(backgroundColor: UIColor.lightBackgroundColor, tintColor: UIColor.textColor)
             .navigationBarItems(leading: Button(action: {
                 isPresented.toggle()
             }) {

@@ -44,7 +44,8 @@ extension PersistentMessageDataItem {
     /// Construct CoreData object from Conversations objects.
     static func from(message: TCHMessage, inConversation conversation: TCHConversation, withDirection direction: MessageDirection, inContext context: NSManagedObjectContext) -> PersistentMessageDataItem? {
         guard let messageSid = message.sid,
-              let conversationSid = conversation.sid else {
+              let conversationSid = conversation.sid,
+              let participantSid = message.participantSid else {
             return nil
         }
 

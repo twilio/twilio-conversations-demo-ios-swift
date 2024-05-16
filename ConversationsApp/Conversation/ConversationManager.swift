@@ -35,38 +35,49 @@ class ConversationManager: ObservableObject {
     
     var conversationEventPublisher = PassthroughSubject<ConversationEvent, Never>()
     
-    init(_ client: ConversationsClientWrapper, coreDataDelegate: CoreDataDelegate ) {
+    init(_ client: ConversationsClientWrapper, coreDataDelegate: CoreDataDelegate) {
         self.client = client
         self.coreDataDelegate = coreDataDelegate
     }
-    
 
     func subscribeConversations(onRefresh: Bool) {
+        cancellableSet.forEach { $0.cancel() }
+        cancellableSet = []
+
         if (onRefresh) {
             isConversationsRefreshing = true
         } else {
             isConversationsLoading = true
         }
+
         NSLog("Setting up Core Data update subscription for Conversations")
         
         let request = PersistentConversationDataItem.fetchRequest()
+
         request.sortDescriptors = [
             NSSortDescriptor(key: "lastMessageDate", ascending: false),
             NSSortDescriptor(key: "friendlyName", ascending: true)]
         
-        ObservableResultPublisher(with: request, context: coreDataDelegate.managedObjectContext)
+        ObservableResultPublisher(
+            with: request,
+            context: coreDataDelegate.managedObjectContext
+        )
+            .receive(on: DispatchQueue.global())
             .sink(
                 receiveCompletion: {
                     NSLog("Completion from fetch conversations - \($0)")
                 },
                 receiveValue: { [weak self] items in
-                    let sortedItems = items.sorted(by: self!.sorterForConversations)
-                    self?.conversations = sortedItems
-                    
-                    if (onRefresh) {
-                        self?.isConversationsRefreshing = false
-                    } else {
-                        self?.isConversationsLoading = false
+                    guard let self else { return }
+                    Task {
+                        await MainActor.run {
+                            self.conversations = items.sorted(by: self.sorterForConversations(this:that:))
+                            if (onRefresh) {
+                                self.isConversationsRefreshing = false
+                            } else {
+                                self.isConversationsLoading = false
+                            }
+                        }
                     }
                 })
             .store(in: &cancellableSet)

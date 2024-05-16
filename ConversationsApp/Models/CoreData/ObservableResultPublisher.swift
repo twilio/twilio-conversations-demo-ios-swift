@@ -36,22 +36,24 @@ class ObservableResultPublisher<Entity>: NSObject, NSFetchedResultsControllerDel
         start = subscriptions == 1
         objc_sync_exit(self)
 
-        if start {
-            let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: context,
-                                                        sectionNameKeyPath: nil, cacheName: nil)
-            controller.delegate = self
+            if start {
+                if resultController == nil {
+                    let controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: context,
+                                                                sectionNameKeyPath: nil, cacheName: nil) as? NSFetchedResultsController<NSManagedObject>
+                    controller?.delegate = self
+                    resultController = controller
+                }
 
-            do {
-                try controller.performFetch()
-                let result = controller.fetchedObjects ?? []
-                subject.send(result)
-            } catch {
-                subject.send(completion: .failure(error))
+                do {
+                    try resultController?.performFetch()
+                    let result = resultController?.fetchedObjects as? [Entity] ?? []
+                    subject.send(result)
+                } catch {
+                    subject.send(completion: .failure(error))
+                }
             }
-            resultController = controller as? NSFetchedResultsController<NSManagedObject>
+            CoreDataSubscription(fetchPublisher: self, subscriber: AnySubscriber(subscriber))
         }
-        CoreDataSubscription(fetchPublisher: self, subscriber: AnySubscriber(subscriber))
-    }
 
     internal func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         let result = controller.fetchedObjects as? [Entity] ?? []

@@ -55,7 +55,6 @@ struct ImageDetailView: View {
                             .opacity(isShowingDetails ? 1 : 0)
                     }
                 }
-                .navigationBarWith(backgroundColor: UIColor(Color("TextColor")), tintColor: UIColor.inverseTextColor)
                 .navigationBarTitle(Text(""), displayMode: .inline)
             }
         }

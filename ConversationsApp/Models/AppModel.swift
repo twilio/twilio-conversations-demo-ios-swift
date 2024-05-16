@@ -64,7 +64,6 @@ class AppModel: NSObject, ObservableObject {
         super.init()
         
         conversationManager = ConversationManager(client, coreDataDelegate: coreDataManager)
-        conversationManager.subscribeConversations(onRefresh: false)
         messagesManager = MessagesManager(coreDataDelegate: coreDataManager, conversationManager: conversationManager)
         participantsManager = ParticipantsManager(coreDataDelegate: coreDataManager, conversationManager: conversationManager)
         
@@ -79,6 +78,10 @@ class AppModel: NSObject, ObservableObject {
         }
         
         networkMonitor.start(queue: .main)
+
+        Task {
+            conversationManager.subscribeConversations(onRefresh: false)
+        }
     }
     
     func getManagedContext() -> NSManagedObjectContext {
@@ -262,7 +265,11 @@ extension AppModel: TwilioConversationsClientDelegate {
 
     func conversationsClient(_ client: TwilioConversationsClient, user: TCHUser, updated update: TCHUserUpdate) {
         if user.identity == myIdentity {
-            myUser = user
+          Task {
+            await MainActor.run {
+              myUser = user
+            }
+          }
         }
     }
 }

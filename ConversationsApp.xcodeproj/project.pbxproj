@@ -77,7 +77,6 @@
 		921E4A21273159DC00628585 /* DebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921E4A20273159DC00628585 /* DebugView.swift */; };
 		921E4A2327315A3A00628585 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921E4A2227315A3A00628585 /* MainView.swift */; };
 		921E4A25273177EE00628585 /* ConversationsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921E4A24273177EE00628585 /* ConversationsApp.swift */; };
-		9223CE0427506CAE00A3DD9D /* NavigationBar+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9223CE0327506CAE00A3DD9D /* NavigationBar+Ext.swift */; };
 		9223CE082751016E00A3DD9D /* ReactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9223CE072751016E00A3DD9D /* ReactionsView.swift */; };
 		923C16F22721BD7D0052D2EF /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923C16F12721BD7D0052D2EF /* SignInView.swift */; };
 		923C16F62722BBAE0052D2EF /* UserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923C16F52722BBAE0052D2EF /* UserProfileView.swift */; };
@@ -216,7 +215,6 @@
 		921E4A20273159DC00628585 /* DebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugView.swift; sourceTree = "<group>"; };
 		921E4A2227315A3A00628585 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		921E4A24273177EE00628585 /* ConversationsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsApp.swift; sourceTree = "<group>"; };
-		9223CE0327506CAE00A3DD9D /* NavigationBar+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NavigationBar+Ext.swift"; sourceTree = "<group>"; };
 		9223CE072751016E00A3DD9D /* ReactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactionsView.swift; sourceTree = "<group>"; };
 		923C16F12721BD7D0052D2EF /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		923C16F52722BBAE0052D2EF /* UserProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileView.swift; sourceTree = "<group>"; };
@@ -607,7 +605,6 @@
 				04CD54FA2746779D001D1EFC /* PushNotificationServiceExtension */,
 				D473F310229D715A008709FB /* Products */,
 				860072DF263C4A82001D7F4E /* Frameworks */,
-				8685E5052B162FC000CBDDBB /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -690,7 +687,6 @@
 				9740A47C2514EC0B00217178 /* URL+Ext.swift */,
 				86F0F78926958E7000669E7A /* UIColor+Ext.swift */,
 				920EEF4427452A0C0070708E /* NSManagedObjectContext+Ext.swift */,
-				9223CE0327506CAE00A3DD9D /* NavigationBar+Ext.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -918,7 +914,6 @@
 				921E4A2327315A3A00628585 /* MainView.swift in Sources */,
 				926BDEE8271EEC02009077F8 /* KeyboardAware.swift in Sources */,
 				97010B442559ED8600071317 /* UIImage+Ext.swift in Sources */,
-				9223CE0427506CAE00A3DD9D /* NavigationBar+Ext.swift in Sources */,
 				86F0F78A26958E7000669E7A /* UIColor+Ext.swift in Sources */,
 				2FA0E96627B334C90007E21F /* SigningInCard.swift in Sources */,
 				2FA0E95E27B32BE10007E21F /* BrandFooter.swift in Sources */,
@@ -1281,7 +1276,7 @@
 			repositoryURL = "https://github.com/twilio/conversations-ios.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.2;
+				minimumVersion = 4.0.3;
 			};
 		};
 		864BF66A272ADF0200B30989 /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */ = {
