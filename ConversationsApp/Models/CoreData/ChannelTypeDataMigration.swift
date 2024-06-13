@@ -32,6 +32,8 @@ class ChannelTypeDataMigration: NSEntityMigrationPolicy {
             case 2:
                 channel = "chat"
             case 3:
+                channel = "sms"
+            case 4:
                 channel = "whatsapp"
             default:
                 channel = nil
