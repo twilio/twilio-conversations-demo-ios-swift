@@ -260,9 +260,13 @@ final class MessageBubbleViewModel: ObservableObject, Identifiable, Hashable, Eq
 
     // MessageDataListItem was the viewModel before, we now use this one, but initialise from the same source:
     init(message: PersistentMessageDataItem, currentUser: String) {
-        self.source = message
-        self.currentUser = currentUser
-        self.attachmentState = updateAttachmentStateIfNeeded()
+      self.currentUser = currentUser
+      self.source = message
+      Task {
+        await MainActor.run {
+          self.attachmentState = updateAttachmentStateIfNeeded()
+        }
+      }
     }
     
     private func updateAttachmentStateIfNeeded() -> MediaAttachmentState {

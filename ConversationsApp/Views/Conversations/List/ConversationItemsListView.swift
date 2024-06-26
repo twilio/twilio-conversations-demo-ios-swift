@@ -74,7 +74,9 @@ struct ConversationItemsListView: View {
             }
             .listStyle(InsetListStyle())
             .refreshable { // MARK: This only works for iOS 15+
-                conversationManager.subscribeConversations(onRefresh: true)
+                Task {
+                    conversationManager.subscribeConversations(onRefresh: true)
+                }
             }
         }
     }

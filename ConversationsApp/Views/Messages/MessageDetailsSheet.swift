@@ -88,7 +88,6 @@ struct ShareSheetView: View {
     var body: some View {
         ShareSheet(activityItems: itemsToShare)
             .navigationBarTitle(Text(viewModel.mediaAttachmentName), displayMode: .inline)
-            .navigationBarWith(backgroundColor: UIColor.lightBackgroundColor, tintColor: UIColor.textColor)
     }
 }
 

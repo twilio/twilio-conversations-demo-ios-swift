@@ -215,8 +215,8 @@ struct MessageListView: View {
                     .padding(EdgeInsets(top: 0, leading: 0, bottom: 15, trailing: 16))
                     .background(Color("LightBackgroundColor"))
                 }
-                .navigationTitle(Text(appModel.selectedConversation?.title ?? "")) // MARK: ios 14+
-                .navigationBarTitleDisplayMode(.inline) // MARK: ios 14+
+                .navigationTitle(Text(appModel.selectedConversation?.title ?? ""))
+                .navigationBarTitleDisplayMode(.inline)
                 .navigationBarBackButtonHidden(true)
                 .navigationBarItems(leading: Button(action : {
                     self.mode.wrappedValue.dismiss()

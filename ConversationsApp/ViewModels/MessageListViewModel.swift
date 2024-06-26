@@ -54,32 +54,45 @@ final class MessageListViewModel: ObservableObject, Identifiable {
     // MARK: Image
     
     func choosePhoto() {
-        sourceType = .photoLibrary
-        isPresentingImagePicker = true
+      Task {
+        await MainActor.run {
+          sourceType = .photoLibrary
+          isPresentingImagePicker = true
+        }
+      }
     }
-    
+
     func takePhoto() {
-        sourceType = .camera
-        isPresentingImagePicker = true
+      Task {
+        await MainActor.run {
+          sourceType = .camera
+          isPresentingImagePicker = true
+        }
+      }
     }
-    
+
     func didSelectImage(_ image: UIImage?, _ url: NSURL?, _ fileName: String?) {
-        selectedImage = image
-        selectedImageURL = url
-        selectedFileName = fileName
-        isPresentingImagePicker = false
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.isPresentingImagePreview = true
+      Task {
+        await MainActor.run {
+          selectedImage = image
+          selectedImageURL = url
+          selectedFileName = fileName
+          isPresentingImagePicker = false
+          isPresentingImagePreview = true
+        }
+      }
+    }
+
+    func clearSelectedImage() {
+        Task {
+            await MainActor.run {
+                selectedImage = nil
+                selectedImageURL = nil
+                selectedFileName = nil
+            }
         }
     }
-    
-    func clearSelectedImage() {
-        selectedImage = nil
-        selectedImageURL = nil
-        selectedFileName = nil
-    }
-    
+
     // adapted from: https://stackoverflow.com/a/45277557
     func getAttachmentFileSize() -> String {
         var result = NSLocalizedString("message.attachment.fallback_size", comment: "Placeholder string used as a fallback in case we cannot get the file size of the attachment")

@@ -23,6 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UNUserNotificationCenter.current().delegate = self
         registerForAPNSNotifications()
         registerDefaultsFromSettingsBundle()
+        customizeTabBarAppearance()
 
         return true
     }
@@ -74,6 +75,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         NSLog("\(defaultsToRegister)")
         UserDefaults.standard.register(defaults: defaultsToRegister)
+    }
+
+    private func customizeTabBarAppearance() {
+
+        // Tab bar
+        let tabBarAppearance = UITabBarAppearance()
+        tabBarAppearance.backgroundColor = UIColor.primaryDarkestBackgroundColor
+        tabBarAppearance.backgroundImage = UIImage()
+        tabBarAppearance.selectionIndicatorTintColor = UIColor.white
+        UITabBar.appearance().standardAppearance = tabBarAppearance
+        UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+
+        // Navigation Bar
+        let navigationBarAppearance = UINavigationBarAppearance()
+        navigationBarAppearance.backgroundColor = UIColor.primaryDarkestBackgroundColor
+        navigationBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.inverseTextColor]
+        navigationBarAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.inverseTextColor]
+        UINavigationBar.appearance().standardAppearance = navigationBarAppearance
+        UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
+        UINavigationBar.appearance().compactAppearance = navigationBarAppearance
+        UINavigationBar.appearance().tintColor = UIColor.inverseTextColor
     }
 }
 

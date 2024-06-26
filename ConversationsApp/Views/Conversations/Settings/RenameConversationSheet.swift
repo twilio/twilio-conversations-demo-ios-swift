@@ -31,7 +31,6 @@ struct RenameConversationSheet: View {
                 Spacer()
             }
             .navigationBarTitle(Text("conversation.settings.rename.title"), displayMode: .inline)
-            .navigationBarWith(backgroundColor: UIColor.lightBackgroundColor, tintColor: UIColor.textColor)
             .navigationBarItems(leading: Button(action: {
                 isPresented.toggle()
             }) {

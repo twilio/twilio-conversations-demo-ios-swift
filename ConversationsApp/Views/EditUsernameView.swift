@@ -30,7 +30,6 @@ struct EditUsernameView: View {
                 Spacer()
             }
             .navigationBarTitle(Text("userProfile.edit.title"), displayMode: .inline)
-            .navigationBarWith(backgroundColor: UIColor.lightBackgroundColor, tintColor: UIColor.textColor)
             .navigationBarItems(leading: Button(action: {
                 isPresented.toggle()
             }) {

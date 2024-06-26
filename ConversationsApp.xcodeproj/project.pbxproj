@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -61,6 +61,8 @@
 		8616F098260B75EC00EAABC0 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 8616F097260B75EC00EAABC0 /* FirebaseCrashlytics */; };
 		864BF66C272ADF0200B30989 /* AppCenterAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 864BF66B272ADF0200B30989 /* AppCenterAnalytics */; };
 		864BF66E272ADF0200B30989 /* AppCenterDistribute in Frameworks */ = {isa = PBXBuildFile; productRef = 864BF66D272ADF0200B30989 /* AppCenterDistribute */; };
+		8685E5022B15384700CBDDBB /* ChannelTypeDataMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8685E5012B15384700CBDDBB /* ChannelTypeDataMigration.swift */; };
+		8685E5042B15495300CBDDBB /* PersistentParticipantMappingModel.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 8685E5032B15495300CBDDBB /* PersistentParticipantMappingModel.xcmappingmodel */; };
 		86C9EB532653C05B007C9984 /* TokenWrapperImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C9EB522653C05B007C9984 /* TokenWrapperImpl.swift */; };
 		86C9EB552653C0BA007C9984 /* TokenWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C9EB542653C0BA007C9984 /* TokenWrapper.swift */; };
 		86F0F78A26958E7000669E7A /* UIColor+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F0F78926958E7000669E7A /* UIColor+Ext.swift */; };
@@ -75,7 +77,6 @@
 		921E4A21273159DC00628585 /* DebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921E4A20273159DC00628585 /* DebugView.swift */; };
 		921E4A2327315A3A00628585 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921E4A2227315A3A00628585 /* MainView.swift */; };
 		921E4A25273177EE00628585 /* ConversationsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921E4A24273177EE00628585 /* ConversationsApp.swift */; };
-		9223CE0427506CAE00A3DD9D /* NavigationBar+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9223CE0327506CAE00A3DD9D /* NavigationBar+Ext.swift */; };
 		9223CE082751016E00A3DD9D /* ReactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9223CE072751016E00A3DD9D /* ReactionsView.swift */; };
 		923C16F22721BD7D0052D2EF /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923C16F12721BD7D0052D2EF /* SignInView.swift */; };
 		923C16F62722BBAE0052D2EF /* UserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923C16F52722BBAE0052D2EF /* UserProfileView.swift */; };
@@ -198,6 +199,9 @@
 		65E894E127AB1A3900B427EF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		65EF853327DFF55400F0C9D1 /* PullToRefresh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullToRefresh.swift; sourceTree = "<group>"; };
 		8628750926A7F799006DC561 /* ConversationsApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ConversationsApp.entitlements; sourceTree = "<group>"; };
+		8685E5002B15358000CBDDBB /* ConversationsApp 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "ConversationsApp 2.xcdatamodel"; sourceTree = "<group>"; };
+		8685E5012B15384700CBDDBB /* ChannelTypeDataMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelTypeDataMigration.swift; sourceTree = "<group>"; };
+		8685E5032B15495300CBDDBB /* PersistentParticipantMappingModel.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = PersistentParticipantMappingModel.xcmappingmodel; sourceTree = "<group>"; };
 		86C9EB522653C05B007C9984 /* TokenWrapperImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenWrapperImpl.swift; sourceTree = "<group>"; };
 		86C9EB542653C0BA007C9984 /* TokenWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenWrapper.swift; sourceTree = "<group>"; };
 		86F0F78926958E7000669E7A /* UIColor+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Ext.swift"; sourceTree = "<group>"; };
@@ -211,7 +215,6 @@
 		921E4A20273159DC00628585 /* DebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugView.swift; sourceTree = "<group>"; };
 		921E4A2227315A3A00628585 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		921E4A24273177EE00628585 /* ConversationsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsApp.swift; sourceTree = "<group>"; };
-		9223CE0327506CAE00A3DD9D /* NavigationBar+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NavigationBar+Ext.swift"; sourceTree = "<group>"; };
 		9223CE072751016E00A3DD9D /* ReactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactionsView.swift; sourceTree = "<group>"; };
 		923C16F12721BD7D0052D2EF /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		923C16F52722BBAE0052D2EF /* UserProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileView.swift; sourceTree = "<group>"; };
@@ -531,6 +534,7 @@
 		97A7164224B847E50053F114 /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
+				8685E5032B15495300CBDDBB /* PersistentParticipantMappingModel.xcmappingmodel */,
 				D4C9FA5F23E6F135008195AF /* ConversationsApp.xcdatamodeld */,
 				D48AC26B2305844E004E66A8 /* ObservableResultPublisher.swift */,
 				D4C9FA8123E6F68E008195AF /* PersistentConversationDataItem+CoreDataExt.swift */,
@@ -538,6 +542,7 @@
 				974E44EB24B84AD60034B086 /* PersistentMessageDataItem+CoreDataExt.swift */,
 				65C4A7E027CD96D000991C5F /* PersistentMediaDataItem+CoreDataExt.swift */,
 				88BEC2AD27FBB4D400C1E9C7 /* CoreDataManager.swift */,
+				8685E5012B15384700CBDDBB /* ChannelTypeDataMigration.swift */,
 			);
 			path = CoreData;
 			sourceTree = "<group>";
@@ -682,7 +687,6 @@
 				9740A47C2514EC0B00217178 /* URL+Ext.swift */,
 				86F0F78926958E7000669E7A /* UIColor+Ext.swift */,
 				920EEF4427452A0C0070708E /* NSManagedObjectContext+Ext.swift */,
-				9223CE0327506CAE00A3DD9D /* NavigationBar+Ext.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -895,11 +899,13 @@
 				2FA0E96827B476A50007E21F /* PasswordVisibilityToggle.swift in Sources */,
 				A47ED36027D70786008E8440 /* ConversationListViewModel.swift in Sources */,
 				2FA0E96427B3317D0007E21F /* UsernameField.swift in Sources */,
+				8685E5042B15495300CBDDBB /* PersistentParticipantMappingModel.xcmappingmodel in Sources */,
 				9261E6A42756D06200134958 /* MessageDetailsSheet.swift in Sources */,
 				921E4A21273159DC00628585 /* DebugView.swift in Sources */,
 				D4B0A08E22B804B8007342AF /* ConversationsCredentialStorage.swift in Sources */,
 				65CDD31727C02316002C937B /* ImageDetailView.swift in Sources */,
 				65A1505727BAC965009D371F /* TypingView.swift in Sources */,
+				8685E5022B15384700CBDDBB /* ChannelTypeDataMigration.swift in Sources */,
 				D4B0A08C22B8047C007342AF /* KeychainPasswordItem.swift in Sources */,
 				2F5F129027D00B3A002E4614 /* InputField.swift in Sources */,
 				65A1505027BAC939009D371F /* PersistanceDataAdapter.swift in Sources */,
@@ -908,7 +914,6 @@
 				921E4A2327315A3A00628585 /* MainView.swift in Sources */,
 				926BDEE8271EEC02009077F8 /* KeyboardAware.swift in Sources */,
 				97010B442559ED8600071317 /* UIImage+Ext.swift in Sources */,
-				9223CE0427506CAE00A3DD9D /* NavigationBar+Ext.swift in Sources */,
 				86F0F78A26958E7000669E7A /* UIColor+Ext.swift in Sources */,
 				2FA0E96627B334C90007E21F /* SigningInCard.swift in Sources */,
 				2FA0E95E27B32BE10007E21F /* BrandFooter.swift in Sources */,
@@ -1271,7 +1276,7 @@
 			repositoryURL = "https://github.com/twilio/conversations-ios.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 3.0.0;
+				minimumVersion = 4.0.3;
 			};
 		};
 		864BF66A272ADF0200B30989 /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */ = {
@@ -1316,9 +1321,10 @@
 		D4C9FA5F23E6F135008195AF /* ConversationsApp.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				8685E5002B15358000CBDDBB /* ConversationsApp 2.xcdatamodel */,
 				D4C9FA6023E6F135008195AF /* ConversationsApp.xcdatamodel */,
 			);
-			currentVersion = D4C9FA6023E6F135008195AF /* ConversationsApp.xcdatamodel */;
+			currentVersion = 8685E5002B15358000CBDDBB /* ConversationsApp 2.xcdatamodel */;
 			path = ConversationsApp.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
