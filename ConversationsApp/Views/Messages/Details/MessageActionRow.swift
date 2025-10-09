@@ -47,6 +47,7 @@ struct MessageActionRow_Previews: PreviewProvider {
         VStack(spacing: 0) {
             MessageActionRow(text: NSLocalizedString("message.details.copy", comment: "Action for copying the body of the selected message"), icon: Image(systemName: "doc.on.doc"))
             MessageActionRow(text: NSLocalizedString("message.details.share", comment: "Action for sharing the body or attachments of the selected message"), icon: Image(systemName: "square.and.arrow.up"))
+            MessageActionRow(text: NSLocalizedString("message.details.edit", comment: "Action for editing the selected message"), icon: Image(systemName: "pencil"))
             MessageActionRow(text: NSLocalizedString("message.details.delete", comment: "Action for deleting the selected message"), icon: Image(systemName: "trash"), rowType: .destructive)
         }
     }

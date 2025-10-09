@@ -13,6 +13,7 @@ struct MessageBubbleView: View {
     @ObservedObject var viewModel: MessageBubbleViewModel
     @EnvironmentObject var appModel: AppModel
     @EnvironmentObject var messagesManager: MessagesManager
+    @EnvironmentObject var messageListViewModel: MessageListViewModel
     
     @State private var whichSheet: ShowWhichDetails = .message
     @State private var showingMessageDetailsSheet = false
@@ -106,7 +107,7 @@ struct MessageBubbleView: View {
             }
         }
         .bottomSheet(isPresented: $showingMessageDetailsSheet, detents: [.medium()]) {
-            MessageDetailsSheet(isPresenting: $showingMessageDetailsSheet, viewModel: self.viewModel, tapReactionAction: tapReactionAction, copyAction: copyAction, deleteAction: deleteAction)
+            MessageDetailsSheet(isPresenting: $showingMessageDetailsSheet, viewModel: self.viewModel, tapReactionAction: tapReactionAction, copyAction: copyAction, deleteAction: deleteAction, editAction: editAction)
                 .environmentObject(appModel)
         }
         .bottomSheet(isPresented: $showingReactionsDetailsView, detents: viewModel.fewParticipantsReacted ? [.medium()] : [.large()]) {
@@ -137,6 +138,10 @@ struct MessageBubbleView: View {
     
     func copyAction() {
         messagesManager.copyMessage()
+    }
+    
+    func editAction() {
+        messageListViewModel.startEditingMessage(viewModel.source)
     }
     
     func deleteAction() {
@@ -239,20 +244,30 @@ struct MessageBubbleView_Previews: PreviewProvider {
         let bubbles: [PersistentMessageDataItem.Decode] = load("testMessages.json")
         let currentUser = "user00"
         let managedObjectContext = appModel.getManagedContext()
+        let messageListViewModel = MessageListViewModel()
         
         List {
             ForEach(0..<100) { n in
                 // Messages with reactions
                 MessageBubbleView(viewModel: MessageBubbleViewModel(message: bubbles[5].message(inContext: managedObjectContext), currentUser: currentUser))
+                    .environmentObject(messageListViewModel)
                 MessageBubbleView(viewModel: MessageBubbleViewModel(message: bubbles[6].message(inContext: managedObjectContext), currentUser: currentUser))
+                    .environmentObject(messageListViewModel)
                 MessageBubbleView(viewModel: MessageBubbleViewModel(message: bubbles[7].message(inContext: managedObjectContext), currentUser: currentUser))
+                    .environmentObject(messageListViewModel)
                 // Regular messages
                 MessageBubbleView(viewModel: MessageBubbleViewModel(message: bubbles[0].message(inContext: managedObjectContext), currentUser: currentUser))
+                    .environmentObject(messageListViewModel)
                 MessageBubbleView(viewModel: MessageBubbleViewModel(message: bubbles[1].message(inContext: managedObjectContext), currentUser: currentUser))
+                    .environmentObject(messageListViewModel)
                 MessageBubbleView(viewModel: MessageBubbleViewModel(message: bubbles[2].message(inContext: managedObjectContext), currentUser: currentUser))
+                    .environmentObject(messageListViewModel)
                 MessageBubbleView(viewModel: MessageBubbleViewModel(message: bubbles[3].message(inContext: managedObjectContext), currentUser: currentUser))
+                    .environmentObject(messageListViewModel)
                 MessageBubbleView(viewModel: MessageBubbleViewModel(message: bubbles[4].message(inContext: managedObjectContext), currentUser: currentUser))
+                    .environmentObject(messageListViewModel)
                 MessageBubbleView(viewModel: MessageBubbleViewModel(message: bubbles[8].message(inContext: managedObjectContext), currentUser: currentUser))
+                    .environmentObject(messageListViewModel)
             }
         }
         .previewLayout(.fixed(width: 400, height: 700))
