@@ -186,17 +186,18 @@ struct PlaceholderImage: View {
 }
 
 struct MessageTextView: View {
+    @ObservedObject private var message: PersistentMessageDataItem
     private var viewModel: MessageBubbleViewModel
     
     var body: some View {
         if viewModel.contentCategory == .text {
             if viewModel.direction == .outgoing {
-                Text(.init(viewModel.text))
+                Text(.init(message.body ?? ""))
                     .padding(EdgeInsets(top: 12, leading: 8, bottom: 8, trailing: 8))
                     .foregroundColor(Color("InverseTextColor"))
                     .font(.system(size: 16))
             } else {
-                Text(.init(viewModel.text))
+                Text(.init(message.body ?? ""))
                     .padding(EdgeInsets(top: 12, leading: 8, bottom: 8, trailing: 8))
                     .foregroundColor(Color("TextColor"))
                     .accentColor(Color("LinkTextColor"))
@@ -207,6 +208,7 @@ struct MessageTextView: View {
     
     init(_ model: MessageBubbleViewModel) {
         self.viewModel = model
+        self.message = model.source
     }
 }
 

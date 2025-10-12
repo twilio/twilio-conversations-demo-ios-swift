@@ -290,7 +290,12 @@ extension AppModel: TCHConversationDelegate {
 
     func conversationsClient(_ client: TwilioConversationsClient, conversation: TCHConversation, message: TCHMessage, updated: TCHMessageUpdate) {
         let managedObjectContext = getManagedContext()
+        // print(message.body)
+        // print(updated.rawValue)
         if let _ = PersistentMessageDataItem.from(message: message, inConversation: conversation, withDirection: message.author == self.myIdentity ? .outgoing : .incoming, inContext: managedObjectContext) {
+            coreDataManager.saveContext()
+        }
+        if let _ = PersistentConversationDataItem.from(conversation: conversation, inContext: managedObjectContext) {
             coreDataManager.saveContext()
         }
     }
