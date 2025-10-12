@@ -16,10 +16,32 @@ struct MessageBubbleView: View {
     @EnvironmentObject var messageListViewModel: MessageListViewModel
     
     @State private var whichSheet: ShowWhichDetails = .message
-    @State private var showingMessageDetailsSheet = false
-    @State private var showingReactionsDetailsView = false
-    @State private var showingDeleteConfirmation = false
     @State private var showingFileAttachment = false
+    
+    private var messageId: String {
+        viewModel.source.sid ?? "unknown"
+    }
+    
+    private var showingMessageDetailsSheet: Binding<Bool> {
+        Binding(
+            get: { appModel.messageDetailsSheetStates[messageId] ?? false },
+            set: { appModel.messageDetailsSheetStates[messageId] = $0 }
+        )
+    }
+    
+    private var showingReactionsDetailsView: Binding<Bool> {
+        Binding(
+            get: { appModel.reactionsDetailsSheetStates[messageId] ?? false },
+            set: { appModel.reactionsDetailsSheetStates[messageId] = $0 }
+        )
+    }
+    
+    private var showingDeleteConfirmation: Binding<Bool> {
+        Binding(
+            get: { appModel.deleteConfirmationStates[messageId] ?? false },
+            set: { appModel.deleteConfirmationStates[messageId] = $0 }
+        )
+    }
     
     var body: some View {
         HStack(alignment: .top) {
@@ -53,7 +75,7 @@ struct MessageBubbleView: View {
                                         .fill(Color.incomingMessageBackgroundColor))
                     }.padding(.bottom, 4)
                     HStack {
-                        TappableReactionView(viewModel: viewModel, showingReactionsDetailsView: $showingReactionsDetailsView, showingDetailSheet: $showingMessageDetailsSheet, whichSheet: $whichSheet)
+                        TappableReactionView(viewModel: viewModel, showingReactionsDetailsView: showingReactionsDetailsView, showingDetailSheet: showingMessageDetailsSheet, whichSheet: $whichSheet)
                         Spacer()
                     }
                 }
@@ -75,7 +97,7 @@ struct MessageBubbleView: View {
                     //reaction
                     HStack {
                         Spacer()
-                        TappableReactionView(viewModel: viewModel, showingReactionsDetailsView: $showingReactionsDetailsView, showingDetailSheet: $showingMessageDetailsSheet, whichSheet: $whichSheet)
+                        TappableReactionView(viewModel: viewModel, showingReactionsDetailsView: showingReactionsDetailsView, showingDetailSheet: showingMessageDetailsSheet, whichSheet: $whichSheet)
                     }
                 }
                 .padding(EdgeInsets(top: 0, leading: 0, bottom: 20, trailing: 32))
@@ -97,7 +119,7 @@ struct MessageBubbleView: View {
         }
         .onLongPressGesture {
             whichSheet = .message
-            showingMessageDetailsSheet.toggle()
+            showingMessageDetailsSheet.wrappedValue.toggle()
         }
         .sheet(isPresented: $showingFileAttachment) {
             if let url = viewModel.downloadedMediaAttachmentURL {
@@ -106,15 +128,15 @@ struct MessageBubbleView: View {
                 EmptyView()
             }
         }
-        .bottomSheet(isPresented: $showingMessageDetailsSheet, detents: [.medium()]) {
-            MessageDetailsSheet(isPresenting: $showingMessageDetailsSheet, viewModel: self.viewModel, tapReactionAction: tapReactionAction, copyAction: copyAction, deleteAction: deleteAction, editAction: editAction)
+        .bottomSheet(isPresented: showingMessageDetailsSheet, detents: [.medium()]) {
+            MessageDetailsSheet(isPresenting: showingMessageDetailsSheet, viewModel: self.viewModel, tapReactionAction: tapReactionAction, copyAction: copyAction, deleteAction: deleteAction, editAction: editAction)
                 .environmentObject(appModel)
         }
-        .bottomSheet(isPresented: $showingReactionsDetailsView, detents: viewModel.fewParticipantsReacted ? [.medium()] : [.large()]) {
-            ReactionsDetailsView(viewModel: viewModel, isPresenting: $showingReactionsDetailsView, tapReactionAction: tapReactionAction)
+        .bottomSheet(isPresented: showingReactionsDetailsView, detents: viewModel.fewParticipantsReacted ? [.medium()] : [.large()]) {
+            ReactionsDetailsView(viewModel: viewModel, isPresenting: showingReactionsDetailsView, tapReactionAction: tapReactionAction)
                 .environmentObject(appModel)
         }
-        .alert(isPresented: $showingDeleteConfirmation) {
+        .alert(isPresented: showingDeleteConfirmation) {
             Alert(
                 title: Text("message.details.delete_title"),
                 message: Text("message.details.delete_description"),
@@ -145,7 +167,7 @@ struct MessageBubbleView: View {
     }
     
     func deleteAction() {
-        showingDeleteConfirmation.toggle()
+        showingDeleteConfirmation.wrappedValue.toggle()
     }
 }
 
