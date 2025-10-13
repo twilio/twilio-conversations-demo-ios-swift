@@ -212,10 +212,13 @@ struct MessageListView: View {
                             if (!textToSend.isEmpty) {
                                 // Send/Update button
                                 Button(action: {
+                                    let trimmedText = textToSend.trimmingCharacters(in: .whitespacesAndNewlines)
+                                    guard !trimmedText.isEmpty else { return }
+                                    
                                     if viewModel.isEditingMessage {
                                         // Update existing message
                                         if let editingMessage = viewModel.editingMessage {
-                                            messagesManager.editMessage(editingMessage, newText: textToSend.trimmingCharacters(in: .whitespacesAndNewlines))
+                                            messagesManager.editMessage(editingMessage, newText: trimmedText)
                                         }
                                         viewModel.stopEditingMessage()
                                         textToSend = ""
