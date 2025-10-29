@@ -214,12 +214,12 @@ struct MessageTextView: View {
     var body: some View {
         if viewModel.contentCategory == .text {
             if viewModel.direction == .outgoing {
-                Text(.init(message.body ?? ""))
+                Text(.init(viewModel.text))
                     .padding(EdgeInsets(top: 12, leading: 8, bottom: 8, trailing: 8))
                     .foregroundColor(Color("InverseTextColor"))
                     .font(.system(size: 16))
             } else {
-                Text(.init(message.body ?? ""))
+                Text(.init(viewModel.text))
                     .padding(EdgeInsets(top: 12, leading: 8, bottom: 8, trailing: 8))
                     .foregroundColor(Color("TextColor"))
                     .accentColor(Color("LinkTextColor"))
