@@ -139,6 +139,34 @@ class MessagesManager: ObservableObject {
         }
     }
     
+    func editMessage(_ message: PersistentMessageDataItem, newText: String) {
+        guard let conversationSid = message.conversationSid else {
+            return
+        }
+        
+        let messageIndex = NSNumber(value: message.messageIndex)
+        
+        conversationManager.retrieveConversation(conversationSid) { [self] (conversation, error) in
+            guard let conversation = conversation, error == nil else {
+                return
+            }
+            
+            self.retrieveMessageIn(conversation, messageIndex: messageIndex) { (message, error) in
+                guard let message = message, error == nil else {
+                    return
+                }
+                
+                message.updateBody(newText) { result in
+                    if result.isSuccessful {
+                        self.conversationManager.conversationEventPublisher.send(.messageUpdated)
+                    } else {
+                        print("Error updating message: ", result.error?.localizedDescription ?? "Unknown error")
+                    }
+                }
+            }
+        }
+    }
+    
     func sendMessage(toConversation conversationItem: PersistentConversationDataItem, withText text: String?, andMedia url: NSURL?, withFileName filename: String?, completion: @escaping (TCHError?) -> ()) {
         guard let sid = conversationItem.sid else {
             return

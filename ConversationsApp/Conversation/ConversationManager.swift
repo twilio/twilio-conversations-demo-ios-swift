@@ -15,6 +15,7 @@ enum ConversationEvent {
     case leftConversation
     case messageCopied
     case messageDeleted
+    case messageUpdated
     case notificationsTurnedOn
     case notificationsTurnedOff
     case participantAdded

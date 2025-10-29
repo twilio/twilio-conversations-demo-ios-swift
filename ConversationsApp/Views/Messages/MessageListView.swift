@@ -40,6 +40,7 @@ struct MessageListView: View {
     @State private var textToSend = ""
     @State private var showingPickerSheet = false
     @State private var cancellableSet: Set<AnyCancellable> = []
+    @FocusState private var isTextFieldFocused: Bool
     private let messagesPaginationSize: UInt = 40
     private let unreadSectionHeaderId = "unreadSectionHeader"
     private let enableUnreadMessageSection = true
@@ -83,6 +84,7 @@ struct MessageListView: View {
                                                 .listRowSeparator(.hidden) // MARK: ios 15+
                                                 .frame(maxWidth: .infinity)
                                                 .id(message.messageIndex)
+                                                .environmentObject(viewModel)
                                         }
                                         if (viewModel.unreadReceivedMessages.count > 0) {
                                             if (showUnreadMessageSection) {
@@ -94,6 +96,7 @@ struct MessageListView: View {
                                                                 .listRowSeparator(.hidden) // MARK: ios 15+
                                                                 .frame(maxWidth: .infinity)
                                                                 .id(message.messageIndex)
+                                                                .environmentObject(viewModel)
                                                                 .onAppear() {
                                                                     if (section.messages.last == message) {
                                                                         //Once we reach the last message, we are triggering a call to mark all messages as read, after 2 sec
@@ -109,6 +112,7 @@ struct MessageListView: View {
                                                         .listRowSeparator(.hidden) // MARK: ios 15+
                                                         .frame(maxWidth: .infinity)
                                                         .id(message.messageIndex)
+                                                        .environmentObject(viewModel)
                                                         .onAppear() {
                                                             if (viewModel.unreadReceivedMessages.last == message) {
                                                                 //Once we reach the last message, we are triggering a call to mark all messages as read
@@ -123,12 +127,14 @@ struct MessageListView: View {
                                                 .listRowSeparator(.hidden) // MARK: ios 15+
                                                 .frame(maxWidth: .infinity)
                                                 .id(message.messageIndex)
+                                                .environmentObject(viewModel)
                                         }
                                     } else {
                                         ForEach(messagesManager.messages, id: \.self) { (message) in
                                             MessageBubbleView(viewModel: MessageBubbleViewModel(message: message, currentUser: appModel.myIdentity))
                                                 .listRowSeparator(.hidden) // MARK: ios 15+
                                                 .frame(maxWidth: .infinity)
+                                                .environmentObject(viewModel)
                                                 .onAppear() {
                                                     if (messagesManager.messages.last == message) {
                                                         //Once we reach the last message, we are triggering a call to mark all messages as read, after 2 sec
@@ -189,24 +195,57 @@ struct MessageListView: View {
                             TextField("conversation.compose.bar.placeholder", text: $textToSend)
                                 .accentColor(Color("LinkTextColor"))
                                 .padding(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 0))
+                                .focused($isTextFieldFocused)
                                 .onChange(of: textToSend) { _ in
                                     appModel.typing(in: appModel.selectedConversation)
                                 }
+                                .onReceive(viewModel.$isEditingMessage) { isEditing in
+                                    if isEditing, let editingMessage = viewModel.editingMessage {
+                                        textToSend = editingMessage.body ?? ""
+                                        isTextFieldFocused = true
+                                    }
+                                }
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 16)
-                                        .stroke(Color("LightBorderColor"), lineWidth: 1))
+                                        .stroke(viewModel.isEditingMessage ? Color("LinkTextColor") : Color("LightBorderColor"), lineWidth: viewModel.isEditingMessage ? 2 : 1))
                                 .background(RoundedRectangle(cornerRadius: 16).fill(Color("InverseTextColor")))
                             if (!textToSend.isEmpty) {
-                                // Send button
+                                // Send/Update button
                                 Button(action: {
-                                    messagesManager.sendMessage(toConversation: conversation, withText: textToSend, andMedia: viewModel.selectedImageURL, withFileName: viewModel.selectedFileName) { error in
-                                        viewModel.clearSelectedImage()
+                                    let trimmedText = textToSend.trimmingCharacters(in: .whitespacesAndNewlines)
+                                    guard !trimmedText.isEmpty else { return }
+                                    
+                                    if viewModel.isEditingMessage {
+                                        // Update existing message
+                                        if let editingMessage = viewModel.editingMessage {
+                                            messagesManager.editMessage(editingMessage, newText: trimmedText)
+                                        }
+                                        viewModel.stopEditingMessage()
                                         textToSend = ""
+                                    } else {
+                                        // Send new message
+                                        messagesManager.sendMessage(toConversation: conversation, withText: textToSend, andMedia: viewModel.selectedImageURL, withFileName: viewModel.selectedFileName) { error in
+                                            viewModel.clearSelectedImage()
+                                            textToSend = ""
+                                        }
                                     }
                                 }) {
-                                    Text("Send")
+                                    Text(viewModel.isEditingMessage ? "Update" : "Send")
                                         .foregroundColor(Color("LinkTextColor"))
                                         .font(.system(size: 14, weight: .bold))
+                                }
+                                .padding(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 0))
+                            }
+                            
+                            // Cancel button for editing mode
+                            if viewModel.isEditingMessage {
+                                Button(action: {
+                                    viewModel.stopEditingMessage()
+                                    textToSend = ""
+                                }) {
+                                    Text("Cancel")
+                                        .foregroundColor(Color("WeakTextColor"))
+                                        .font(.system(size: 14))
                                 }
                                 .padding(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 0))
                             }
@@ -366,7 +405,12 @@ struct UnreadSectionHeaderView: View {
         withAnimation {
             GlobalStatusView(message: NSLocalizedString("conversation.status.message_deleted", comment: "Notification indicating that the message was successfully deleted"), kind: .success)
         }
-    } else {
+    } else if event == .messageUpdated {
+        withAnimation {
+            GlobalStatusView(message: NSLocalizedString("conversation.status.message_updated", comment: "Notification indicating that the message was successfully updated"), kind: .success)
+        }
+    }
+    else {
         EmptyView()
     }
 }

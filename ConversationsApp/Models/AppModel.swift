@@ -28,6 +28,11 @@ class AppModel: NSObject, ObservableObject {
     @Published var globalStatus: GlobalStatus = .none
     @Published var conversationsError: TCHError? = nil
     
+    // Sheet state management for messages
+    @Published var messageDetailsSheetStates: [String: Bool] = [:]
+    @Published var reactionsDetailsSheetStates: [String: Bool] = [:]
+    @Published var deleteConfirmationStates: [String: Bool] = [:]
+    
     private var clientState: TCHClientConnectionState = .unknown
     private var imageCache = DefaultImageCache.shared
     private(set) var client: ConversationsClientWrapper = ConversationsClientWrapper()
@@ -291,6 +296,9 @@ extension AppModel: TCHConversationDelegate {
     func conversationsClient(_ client: TwilioConversationsClient, conversation: TCHConversation, message: TCHMessage, updated: TCHMessageUpdate) {
         let managedObjectContext = getManagedContext()
         if let _ = PersistentMessageDataItem.from(message: message, inConversation: conversation, withDirection: message.author == self.myIdentity ? .outgoing : .incoming, inContext: managedObjectContext) {
+            coreDataManager.saveContext()
+        }
+        if let _ = PersistentConversationDataItem.from(conversation: conversation, inContext: managedObjectContext) {
             coreDataManager.saveContext()
         }
     }

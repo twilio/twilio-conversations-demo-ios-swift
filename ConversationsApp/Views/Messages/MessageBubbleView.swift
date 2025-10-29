@@ -13,12 +13,35 @@ struct MessageBubbleView: View {
     @ObservedObject var viewModel: MessageBubbleViewModel
     @EnvironmentObject var appModel: AppModel
     @EnvironmentObject var messagesManager: MessagesManager
+    @EnvironmentObject var messageListViewModel: MessageListViewModel
     
     @State private var whichSheet: ShowWhichDetails = .message
-    @State private var showingMessageDetailsSheet = false
-    @State private var showingReactionsDetailsView = false
-    @State private var showingDeleteConfirmation = false
     @State private var showingFileAttachment = false
+    
+    private var messageId: String {
+        viewModel.source.sid ?? "unknown"
+    }
+    
+    private var showingMessageDetailsSheet: Binding<Bool> {
+        Binding(
+            get: { appModel.messageDetailsSheetStates[messageId] ?? false },
+            set: { appModel.messageDetailsSheetStates[messageId] = $0 }
+        )
+    }
+    
+    private var showingReactionsDetailsView: Binding<Bool> {
+        Binding(
+            get: { appModel.reactionsDetailsSheetStates[messageId] ?? false },
+            set: { appModel.reactionsDetailsSheetStates[messageId] = $0 }
+        )
+    }
+    
+    private var showingDeleteConfirmation: Binding<Bool> {
+        Binding(
+            get: { appModel.deleteConfirmationStates[messageId] ?? false },
+            set: { appModel.deleteConfirmationStates[messageId] = $0 }
+        )
+    }
     
     var body: some View {
         HStack(alignment: .top) {
@@ -52,7 +75,7 @@ struct MessageBubbleView: View {
                                         .fill(Color.incomingMessageBackgroundColor))
                     }.padding(.bottom, 4)
                     HStack {
-                        TappableReactionView(viewModel: viewModel, showingReactionsDetailsView: $showingReactionsDetailsView, showingDetailSheet: $showingMessageDetailsSheet, whichSheet: $whichSheet)
+                        TappableReactionView(viewModel: viewModel, showingReactionsDetailsView: showingReactionsDetailsView, showingDetailSheet: showingMessageDetailsSheet, whichSheet: $whichSheet)
                         Spacer()
                     }
                 }
@@ -74,7 +97,7 @@ struct MessageBubbleView: View {
                     //reaction
                     HStack {
                         Spacer()
-                        TappableReactionView(viewModel: viewModel, showingReactionsDetailsView: $showingReactionsDetailsView, showingDetailSheet: $showingMessageDetailsSheet, whichSheet: $whichSheet)
+                        TappableReactionView(viewModel: viewModel, showingReactionsDetailsView: showingReactionsDetailsView, showingDetailSheet: showingMessageDetailsSheet, whichSheet: $whichSheet)
                     }
                 }
                 .padding(EdgeInsets(top: 0, leading: 0, bottom: 20, trailing: 32))
@@ -96,7 +119,7 @@ struct MessageBubbleView: View {
         }
         .onLongPressGesture {
             whichSheet = .message
-            showingMessageDetailsSheet.toggle()
+            showingMessageDetailsSheet.wrappedValue.toggle()
         }
         .sheet(isPresented: $showingFileAttachment) {
             if let url = viewModel.downloadedMediaAttachmentURL {
@@ -105,15 +128,15 @@ struct MessageBubbleView: View {
                 EmptyView()
             }
         }
-        .bottomSheet(isPresented: $showingMessageDetailsSheet, detents: [.medium()]) {
-            MessageDetailsSheet(isPresenting: $showingMessageDetailsSheet, viewModel: self.viewModel, tapReactionAction: tapReactionAction, copyAction: copyAction, deleteAction: deleteAction)
+        .bottomSheet(isPresented: showingMessageDetailsSheet, detents: [.medium()]) {
+            MessageDetailsSheet(isPresenting: showingMessageDetailsSheet, viewModel: self.viewModel, tapReactionAction: tapReactionAction, copyAction: copyAction, deleteAction: deleteAction, editAction: editAction)
                 .environmentObject(appModel)
         }
-        .bottomSheet(isPresented: $showingReactionsDetailsView, detents: viewModel.fewParticipantsReacted ? [.medium()] : [.large()]) {
-            ReactionsDetailsView(viewModel: viewModel, isPresenting: $showingReactionsDetailsView, tapReactionAction: tapReactionAction)
+        .bottomSheet(isPresented: showingReactionsDetailsView, detents: viewModel.fewParticipantsReacted ? [.medium()] : [.large()]) {
+            ReactionsDetailsView(viewModel: viewModel, isPresenting: showingReactionsDetailsView, tapReactionAction: tapReactionAction)
                 .environmentObject(appModel)
         }
-        .alert(isPresented: $showingDeleteConfirmation) {
+        .alert(isPresented: showingDeleteConfirmation) {
             Alert(
                 title: Text("message.details.delete_title"),
                 message: Text("message.details.delete_description"),
@@ -139,8 +162,12 @@ struct MessageBubbleView: View {
         messagesManager.copyMessage()
     }
     
+    func editAction() {
+        messageListViewModel.startEditingMessage(viewModel.source)
+    }
+    
     func deleteAction() {
-        showingDeleteConfirmation.toggle()
+        showingDeleteConfirmation.wrappedValue.toggle()
     }
 }
 
@@ -181,6 +208,7 @@ struct PlaceholderImage: View {
 }
 
 struct MessageTextView: View {
+    @ObservedObject private var message: PersistentMessageDataItem
     private var viewModel: MessageBubbleViewModel
     
     var body: some View {
@@ -202,6 +230,7 @@ struct MessageTextView: View {
     
     init(_ model: MessageBubbleViewModel) {
         self.viewModel = model
+        self.message = model.source
     }
 }
 
@@ -239,20 +268,30 @@ struct MessageBubbleView_Previews: PreviewProvider {
         let bubbles: [PersistentMessageDataItem.Decode] = load("testMessages.json")
         let currentUser = "user00"
         let managedObjectContext = appModel.getManagedContext()
+        let messageListViewModel = MessageListViewModel()
         
         List {
             ForEach(0..<100) { n in
                 // Messages with reactions
                 MessageBubbleView(viewModel: MessageBubbleViewModel(message: bubbles[5].message(inContext: managedObjectContext), currentUser: currentUser))
+                    .environmentObject(messageListViewModel)
                 MessageBubbleView(viewModel: MessageBubbleViewModel(message: bubbles[6].message(inContext: managedObjectContext), currentUser: currentUser))
+                    .environmentObject(messageListViewModel)
                 MessageBubbleView(viewModel: MessageBubbleViewModel(message: bubbles[7].message(inContext: managedObjectContext), currentUser: currentUser))
+                    .environmentObject(messageListViewModel)
                 // Regular messages
                 MessageBubbleView(viewModel: MessageBubbleViewModel(message: bubbles[0].message(inContext: managedObjectContext), currentUser: currentUser))
+                    .environmentObject(messageListViewModel)
                 MessageBubbleView(viewModel: MessageBubbleViewModel(message: bubbles[1].message(inContext: managedObjectContext), currentUser: currentUser))
+                    .environmentObject(messageListViewModel)
                 MessageBubbleView(viewModel: MessageBubbleViewModel(message: bubbles[2].message(inContext: managedObjectContext), currentUser: currentUser))
+                    .environmentObject(messageListViewModel)
                 MessageBubbleView(viewModel: MessageBubbleViewModel(message: bubbles[3].message(inContext: managedObjectContext), currentUser: currentUser))
+                    .environmentObject(messageListViewModel)
                 MessageBubbleView(viewModel: MessageBubbleViewModel(message: bubbles[4].message(inContext: managedObjectContext), currentUser: currentUser))
+                    .environmentObject(messageListViewModel)
                 MessageBubbleView(viewModel: MessageBubbleViewModel(message: bubbles[8].message(inContext: managedObjectContext), currentUser: currentUser))
+                    .environmentObject(messageListViewModel)
             }
         }
         .previewLayout(.fixed(width: 400, height: 700))

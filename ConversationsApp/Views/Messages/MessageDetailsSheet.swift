@@ -21,6 +21,7 @@ struct MessageDetailsSheet: View {
     var tapReactionAction: (() -> Void)?
     var copyAction: (() -> Void)?
     var deleteAction: (() -> Void)?
+    var editAction: (() -> Void)?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -30,6 +31,7 @@ struct MessageDetailsSheet: View {
             
             if (viewModel.contentCategory == .text) {
                 MessageActionRow(text: NSLocalizedString("message.details.copy", comment: "Action for copying the body of the selected message"), icon: Image(systemName: "doc.on.doc"), action: copyTextAction)
+                MessageActionRow(text: NSLocalizedString("message.details.edit", comment: "Action for editing the body of the selected message"), icon: Image(systemName: "pencil"), action: editTextAction)
             }
             
             let shareText = NSLocalizedString("message.details.share", comment: "Action for sharing the body or attachments of the selected message")
@@ -69,6 +71,11 @@ struct MessageDetailsSheet: View {
     func deleteTextAction() {
         isPresenting.toggle()
         deleteAction?()
+    }
+    
+    func editTextAction() {
+        isPresenting.toggle()
+        editAction?()
     }
 }
 

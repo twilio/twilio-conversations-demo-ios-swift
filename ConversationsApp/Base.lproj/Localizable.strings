@@ -215,6 +215,7 @@
 
 "conversation.status.message_copied" = "Message copied";
 "conversation.status.message_deleted" = "Message deleted";
+"conversation.status.message_updated" = "Message updated";
 "conversation.status.participant_added" = "Participant added";
 "conversation.status.participant_removed" = "Participant removed";
 
@@ -267,6 +268,7 @@
 // MARK: - Message details
 "message.details.copy" = "Copy";
 "message.details.share" = "Share...";
+"message.details.edit" = "Edit";
 "message.details.delivery_status" = "View Delivery Status";
 "message.details.delete" = "Delete";
 "message.details.delete_title" = "Delete message?";

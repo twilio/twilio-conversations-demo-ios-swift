@@ -29,6 +29,10 @@ final class MessageListViewModel: ObservableObject, Identifiable {
     // ConversationEvents
     @Published var currentConversationEvent: ConversationEvent? = nil
     
+    // Editing
+    @Published var isEditingMessage = false
+    @Published var editingMessage: PersistentMessageDataItem?
+    
     //Read/Unread messages
     @Published var readMessages = [PersistentMessageDataItem]()
     @Published var unreadReceivedMessages = [PersistentMessageDataItem]()
@@ -188,5 +192,24 @@ final class MessageListViewModel: ObservableObject, Identifiable {
                 return false
             }
         })
+    }
+    
+    // MARK: - Editing
+    func startEditingMessage(_ message: PersistentMessageDataItem) {
+        Task {
+            await MainActor.run {
+                editingMessage = message
+                isEditingMessage = true
+            }
+        }
+    }
+    
+    func stopEditingMessage() {
+        Task {
+            await MainActor.run {
+                editingMessage = nil
+                isEditingMessage = false
+            }
+        }
     }
 }
