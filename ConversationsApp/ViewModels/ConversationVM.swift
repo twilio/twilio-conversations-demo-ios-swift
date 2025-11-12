@@ -23,7 +23,7 @@ class ConversationViewModel: NSObject {
 
     private(set) var observableConversation: ObservableFetchRequestResult<PersistentConversationDataItem>?
     lazy private(set) var observableMessageList = conversationsRepository.getObservableMessages(for: conversationSid)
-    private(set) var observervableTypingMemeberList: ObservableFetchRequestResult<PersistentParticipantDataItem>?
+    private(set) var observableTypingParticipantList: ObservableFetchRequestResult<PersistentParticipantDataItem>?
     private(set) var messageItems: [MessageListItemCell] = [] {
         didSet {
             self.delegate?.messageListUpdated(from: oldValue, to: messageItems)
@@ -40,7 +40,7 @@ class ConversationViewModel: NSObject {
 
     weak var delegate: ConversationViewModelDelegate?
 
-    // MARK: Init
+    // MARK: Initialize the Conversation
     init(conversationSid: String, conversationsRepository: ConversationsRepositoryProtocol = ConversationsRepository.shared, messagesManager: MessagesManagerProtocol = MessagesManager()) {
         self.conversationSid = conversationSid
         self.conversationsRepository = conversationsRepository
@@ -68,17 +68,17 @@ class ConversationViewModel: NSObject {
         messagesManager.reactToMessage(withSid: sid, withReaction: reaction)
     }
 
-    // MARK: Deintialization
+    // Deinitialization
     deinit {
         // During transition, remove observers
         unsubscribeFromConversationChanges()
     }
     
-    // MARK: Methods
+    // Methods
     private func unsubscribeFromConversationChanges() {
         observableConversation?.removeObserver(self)
         observableMessageList.removeObserver(self)
-        observervableTypingMemeberList?.removeObserver(self)
+        observervableTypingMemberList?.removeObserver(self)
     }
     
     private func listenForConversationChanges() {
@@ -88,7 +88,7 @@ class ConversationViewModel: NSObject {
     }
 
     private func listenForTypingParticipant() {
-        observervableTypingMemeberList?.observe(with: self) {[weak self] participants in
+        observervableTypingMemberList?.observe(with: self) {[weak self] participants in
             guard let participants = participants else {
                 return
             }
@@ -107,7 +107,7 @@ class ConversationViewModel: NSObject {
     
     func loadConversation() {
         observableConversation = fetchConversation(sid: conversationSid)
-        observervableTypingMemeberList = conversationsRepository.getTypingParticipants(inConversation: conversationSid).data
+        observervableTypingMemberList = conversationsRepository.getTypingParticipants(inConversation: conversationSid).data
         listenForConversationChanges()
         listenForConversationMessagesChanges()
         listenForTypingParticipant()
